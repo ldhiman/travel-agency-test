@@ -86,7 +86,6 @@ const TripPlanner = () => {
 
     return {
       ...baseOptions,
-      types: ["establishment"],
       ...(userLocation && {
         bounds: new window.google.maps.LatLngBounds(
           new window.google.maps.LatLng(
