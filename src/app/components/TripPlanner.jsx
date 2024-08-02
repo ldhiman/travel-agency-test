@@ -3,22 +3,22 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import TextField from "@mui/material/TextField";
+import { processTripData } from "../api/processTripData";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { isFuture, isAfter, setHours, setMinutes } from "date-fns";
 
 const libraries = ["places"];
 
 const TripPlanner = () => {
   const [autocompleteSource, setAutocompleteSource] = useState(null);
   const [autocompleteDestination, setAutocompleteDestination] = useState(null);
-  const [pickupDate, setPickupDate] = useState(null);
-  const [returnDate, setReturnDate] = useState(null);
-  const [pickupTime, setPickupTime] = useState(null);
-  const [returnTime, setReturnTime] = useState(null);
+  const [pickupDatetime, setPickupDatetime] = useState(null);
+  const [returnDatetime, setReturnDatetime] = useState(null);
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
+  const [sourceCoords, setSourceCoords] = useState(null);
+  const [destinationCoords, setDestinationCoords] = useState(null);
   const [tripType, setTripType] = useState("ONE WAY");
   const [userLocation, setUserLocation] = useState(null);
   const [error, setError] = useState("");
@@ -44,11 +44,19 @@ const TripPlanner = () => {
       place = autocompleteSource.getPlace();
       if (place && place.geometry) {
         setSource(place.formatted_address || "");
+        setSourceCoords({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
       }
     } else if (field === "destination" && autocompleteDestination) {
       place = autocompleteDestination.getPlace();
       if (place && place.geometry) {
         setDestination(place.formatted_address || "");
+        setDestinationCoords({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
       }
     }
   };
@@ -63,7 +71,17 @@ const TripPlanner = () => {
     }
 
     if (tripType === "LOCAL") {
-      return { ...baseOptions, types: ["local"] };
+      return {
+        ...baseOptions,
+        types: ["local"],
+        ...(userLocation && {
+          location: new window.google.maps.LatLng(
+            userLocation.lat,
+            userLocation.lng
+          ),
+          radius: 10000, // 10KM
+        }),
+      };
     }
 
     return {
@@ -84,67 +102,134 @@ const TripPlanner = () => {
     };
   }, [tripType, userLocation]);
 
-  const isFutureDate = (date) => date && isFuture(date);
-  const isFutureDateTime = (date, time) => {
-    if (!date || !time) return false;
-    const combinedDateTime = new Date(date);
-    combinedDateTime.setHours(time.getHours(), time.getMinutes());
-    return isFuture(combinedDateTime);
-  };
-
   const handleExploreCabs = () => {
-    if (!source || !destination || !pickupDate || !pickupTime) {
-      setError("Please fill in all required fields.");
+    // Validate source and destination
+    if (!source) {
+      setError("Source location is required.");
       return;
     }
 
-    if (tripType === "ROUND TRIP" && (!returnDate || !returnTime)) {
-      setError("Please select a return date and time for round trip.");
+    if (!destination) {
+      setError("Destination location is required.");
       return;
     }
 
-    if (!isFutureDate(pickupDate)) {
-      setError("Pickup date must be in the future.");
+    if (!sourceCoords) {
+      setError("Please Select Source Location from Given Options.");
       return;
     }
 
-    if (!isFutureDateTime(pickupDate, pickupTime)) {
-      setError("Pickup date and time must be in the future.");
+    if (!destinationCoords) {
+      setError("Please Select Destination Location from Given Options.");
       return;
     }
 
+    // Validate pickup datetime
+    if (!pickupDatetime) {
+      setError("Pickup date and time are required.");
+      return;
+    }
+
+    const now = new Date();
+    const minPickupDatetime = new Date(now.getTime() + 30 * 60000); // 30 minutes from now
+
+    if (pickupDatetime < minPickupDatetime) {
+      setError("Pickup date and time must be at least 30 minutes from now.");
+      return;
+    }
+
+    // Validate return datetime for ROUND TRIP
     if (tripType === "ROUND TRIP") {
-      // Combine pickup date and time
-      const pickupDateTime = setHours(
-        setMinutes(pickupDate, pickupTime.getMinutes()),
-        pickupTime.getHours()
-      );
+      if (!returnDatetime) {
+        setError("Return date and time are required for a round trip.");
+        return;
+      }
 
-      // Check if return date and time are after pickup date and time
-      const returnDateTime = setHours(
-        setMinutes(returnDate, returnTime.getMinutes()),
-        returnTime.getHours()
-      );
-      if (
-        !isFuture(returnDateTime) ||
-        !isAfter(returnDateTime, pickupDateTime)
-      ) {
-        setError("Return date and time must be after pickup date and time.");
+      if (returnDatetime <= pickupDatetime) {
+        setError(
+          "Return date and time must be later than the pickup date and time."
+        );
         return;
       }
     }
 
+    // If no errors, proceed with processing the trip data
     setError("");
+
     const tripData = {
       tripType,
       source,
       destination,
-      pickupDate,
-      pickupTime,
-      returnDate: tripType === "ROUND TRIP" ? returnDate : undefined,
-      returnTime: tripType === "ROUND TRIP" ? returnTime : undefined,
+      pickupDatetime: pickupDatetime?.getTime(),
+      sourceCoords,
+      destinationCoords,
+      ...(tripType === "ROUND TRIP" && {
+        returnDatetime: returnDatetime?.getTime(),
+      }),
     };
+
     console.log("Trip Data:", JSON.stringify(tripData, null, 2));
+    processTripData(tripData);
+  };
+
+  const getMinTime = () => {
+    const now = new Date();
+    return new Date(now.getTime() + 30 * 60000); // 30 minutes from now
+  };
+
+  const isValidDatetime = (datetime) => {
+    if (!pickupDatetime) return true; // No date-time selected yet
+
+    const minTime = new Date(pickupDatetime);
+    minTime.setMinutes(minTime.getMinutes() + 30);
+
+    return datetime >= minTime;
+  };
+
+  const handlePickupDateChange = (date) => {
+    setPickupDatetime((prev) => {
+      if (prev) {
+        return new Date(date.setHours(prev.getHours(), prev.getMinutes()));
+      }
+      return new Date(date);
+    });
+  };
+
+  const handlePickupTimeChange = (time) => {
+    if (pickupDatetime) {
+      const newDatetime = new Date(pickupDatetime);
+      newDatetime.setHours(time.getHours());
+      newDatetime.setMinutes(time.getMinutes());
+      if (isValidDatetime(newDatetime)) {
+        setPickupDatetime(newDatetime);
+      } else {
+        console.log("Selected time is less than 30 minutes from now.");
+        setPickupDatetime(getMinTime());
+      }
+    }
+  };
+
+  const handleReturnDateChange = (date) => {
+    setReturnDatetime((prev) => {
+      if (prev) {
+        return new Date(date.setHours(prev.getHours(), prev.getMinutes()));
+      }
+      return new Date(date);
+    });
+  };
+
+  const handleReturnTimeChange = (time) => {
+    if (returnDatetime) {
+      const newDatetime = new Date(returnDatetime);
+      newDatetime.setHours(time.getHours());
+      newDatetime.setMinutes(time.getMinutes());
+      if (isValidDatetime(newDatetime)) {
+        setReturnDatetime(newDatetime);
+      } else {
+        console.log("Selected time is less than 30 minutes from now.");
+        setReturnDatetime(getMinTime());
+      }
+    }
   };
 
   if (!isLoaded) return <div>Loading...</div>;
@@ -193,28 +278,38 @@ const TripPlanner = () => {
           <DatePickerField
             id="pickup-date-field"
             label="PICK UP DATE"
-            value={pickupDate}
-            onChange={setPickupDate}
+            value={pickupDatetime ? pickupDatetime : null}
+            onChange={handlePickupDateChange}
+            minDate={new Date()} // Disables past dates
           />
+
           <TimePickerField
             id="pickup-time-field"
             label="PICK UP TIME"
-            value={pickupTime}
-            onChange={setPickupTime}
+            value={pickupDatetime ? pickupDatetime : null}
+            onChange={handlePickupTimeChange}
+            disabled={!pickupDatetime} // Disable until date is selected
           />
+
           {tripType === "ROUND TRIP" && (
             <>
               <DatePickerField
                 id="return-date-field"
                 label="RETURN DATE"
-                value={returnDate}
-                onChange={setReturnDate}
+                value={returnDatetime ? returnDatetime : null}
+                minDate={
+                  pickupDatetime
+                    ? new Date(pickupDatetime.getTime())
+                    : new Date()
+                }
+                onChange={handleReturnDateChange}
               />
               <TimePickerField
                 id="return-time-field"
                 label="RETURN TIME"
-                value={returnTime}
-                onChange={setReturnTime}
+                value={returnDatetime ? returnDatetime : null}
+                onChange={handleReturnTimeChange}
+                disabled={!returnDatetime} // Disable until return date is selected
               />
             </>
           )}
@@ -261,24 +356,26 @@ const AutocompleteField = ({
   </div>
 );
 
-const DatePickerField = ({ id, label, value, onChange }) => (
-  <div className="relative ml-4 md:w-full lg:w-full xl:w-3/4">
+const DatePickerField = ({ id, label, value, onChange, minDate }) => (
+  <div className="relative flex flex-col ml-4 md:w-full lg:w-full xl:w-3/4">
     <label htmlFor={id} className="leading-7 text-sm text-gray-600">
       {label}
     </label>
     <DatePicker
       value={value}
-      onChange={onChange}
+      onChange={(date) => {
+        onChange(date);
+      }}
       renderInput={(params) => <TextField {...params} fullWidth />}
-      className="w-full"
-      inputFormat="MM/dd/yyyy"
+      minDate={minDate}
+      inputFormat="dd/MM/yyyy"
       placeholder={`Select ${label.toLowerCase()}`}
     />
   </div>
 );
 
-const TimePickerField = ({ id, label, value, onChange }) => (
-  <div className="relative ml-4 md:w-full lg:w-full xl:w-3/4">
+const TimePickerField = ({ id, label, value, onChange, disabled }) => (
+  <div className="relative flex flex-col ml-4 md:w-full lg:w-full xl:w-3/4">
     <label htmlFor={id} className="leading-7 text-sm text-gray-600">
       {label}
     </label>
@@ -286,7 +383,8 @@ const TimePickerField = ({ id, label, value, onChange }) => (
       value={value}
       onChange={onChange}
       renderInput={(params) => <TextField {...params} fullWidth />}
-      className="w-full"
+      disabled={disabled}
+      ampm={true} // Optional: If you want to use 24-hour time format
     />
   </div>
 );
