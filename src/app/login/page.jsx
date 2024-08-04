@@ -60,9 +60,8 @@ export default function LoginPage() {
           toast.success("OTP sent successfully!");
 
           if (confirmationResult && confirmationResult.verificationId) {
-            setVerificationId(confirmationResult.verificationId); // Set the verificationId
+            setVerificationId(confirmationResult.verificationId);
             setOtpSent(true);
-            console.log("Verification ID:", confirmationResult.verificationId); // Debugging log
           } else {
             console.error("No verification ID found in confirmationResult.");
             toast.error("Failed to retrieve verification ID.");
@@ -131,7 +130,6 @@ export default function LoginPage() {
               <input
                 type="text"
                 value={phoneNumber}
-                disabled={otpSent}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm outline-none"
                 placeholder="Phone number"
@@ -140,6 +138,7 @@ export default function LoginPage() {
             <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
             <button
               onClick={requestOtp}
+              disabled={otpSent}
               className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
             >
               Send OTP
