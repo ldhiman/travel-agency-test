@@ -34,7 +34,7 @@ export default function Navbar() {
           href="/"
           className="flex font-ubantu font-bold items-center text-customPink mb-4 md:mb-0"
         >
-          <span className="ml-3 text-xl">Travelindia</span>
+          <span className="ml-3 text-xl">TravelIndia</span>
           <span className="text-medium">.tours</span>
         </Link>
         <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
