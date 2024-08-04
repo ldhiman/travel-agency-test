@@ -74,9 +74,10 @@ export default function LoginPage() {
             toast.error(
               "Too many requests. Please wait a few minutes before trying again."
             );
+          } else {
+            toast.error("An error occurred. Please try again.");
           }
           console.log(error);
-          toast.error("An error occurred. Please try again.");
         });
     } catch (error) {
       console.error("Error during signInWithPhoneNumber:", error);
@@ -101,7 +102,11 @@ export default function LoginPage() {
       toast.success("User logged in successfully.");
       router.push("/register");
     } catch (error) {
-      toast.error("Error during OTP verification: " + error.message);
+      if (error.code === "auth/invalid-verification-code") {
+        toast.error("Invalid OTP!!");
+      } else {
+        toast.error("Error during OTP verification: " + error.message);
+      }
       console.error("Error during OTP verification:", error);
     } finally {
       toast.dismiss(toastId);
@@ -142,6 +147,7 @@ export default function LoginPage() {
 
             {otpSent && (
               <>
+                <br />
                 <label className="font-semibold text-sm text-gray-600 pb-1 block">
                   Verify OTP
                 </label>
