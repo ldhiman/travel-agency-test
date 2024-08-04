@@ -1,5 +1,18 @@
 "use client";
 
+<<<<<<< HEAD
+import { BsFillShieldLockFill, BsTelephoneFill } from "react-icons/bs";
+import { CgSpinner } from "react-icons/cg";
+import OtpInput from "otp-input-react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { toast, Toaster } from "react-hot-toast";
+
+import { useState, useEffect } from "react";
+import { auth } from "../firebase";
+import { useRouter } from "next/navigation";
+import {RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+=======
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -12,12 +25,20 @@ import {
   signInWithCredential,
 } from "../firebase";
 import { ref, set } from "firebase/database";
+>>>>>>> origin/main
 
-export default function LoginPage() {
-  const [phoneNumber, setPhoneNumber] = useState("");
+
+const LoginPage = () => {
   const [otp, setOtp] = useState("");
+<<<<<<< HEAD
+  const [ph, setPh] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
+  const [user, setUser] = useState(null);
+=======
   const [verificationId, setVerificationId] = useState(null);
   const [otpSent, setOtpSent] = useState(false);
+>>>>>>> origin/main
   const router = useRouter();
   const recaptchaContainerRef = useRef(null);
 
@@ -35,50 +56,59 @@ export default function LoginPage() {
           callback: () => {
             console.log("reCAPTCHA resolved.");
           },
-          "expired-callback": () => {
-            console.log("reCAPTCHA expired.");
-          },
         }
       );
       window.recaptchaVerifier = recaptchaVerifier;
-
-      // Render the reCAPTCHA widget
-      recaptchaVerifier.render().catch((error) => {
-        console.error("Error rendering reCAPTCHA:", error);
-        toast.error("Failed to initialize reCAPTCHA.");
-      });
     }
   }, [recaptchaContainerRef]);
 
+<<<<<<< HEAD
+function onCaptchVerify() {
+  // Check if the reCAPTCHA verifier has already been initialized
+  if (!window.recaptchaVerifier) {
+    // Create a new instance of RecaptchaVerifier
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container", // ID of the container element for reCAPTCHA
+      {
+        size: "invisible", // Use an invisible reCAPTCHA
+        callback: (response) => {
+          // Callback for successful reCAPTCHA completion
+          onSignup();
+        },
+        "expired-callback": () => {
+          // Handle reCAPTCHA expiration
+          console.log("reCAPTCHA expired. Please try again.");
+        },
+      },
+      auth // Pass the correctly initialized Firebase Auth instance
+    );
+  }
+}
+=======
   const requestOtp = async () => {
     const appVerifier = window.recaptchaVerifier;
     try {
-      let toastId = toast.loading("Sending OTP..");
-      signInWithPhoneNumber(auth, "+91" + phoneNumber, appVerifier)
-        .then((confirmationResult) => {
-          toast.dismiss(toastId);
-          toast.success("OTP sent successfully!");
+      const confirmationResult = signInWithPhoneNumber(
+        auth,
+        "+91" + phoneNumber,
+        appVerifier
+      );
 
-          if (confirmationResult && confirmationResult.verificationId) {
-            setVerificationId(confirmationResult.verificationId); // Set the verificationId
-            setOtpSent(true);
-            console.log("Verification ID:", confirmationResult.verificationId); // Debugging log
-          } else {
-            console.error("No verification ID found in confirmationResult.");
-            toast.error("Failed to retrieve verification ID.");
-          }
-        })
-        .catch((error) => {
-          toast.dismiss(toastId);
+      toast.promise(confirmationResult, {
+        loading: "Sending OTP...",
+        success: () => {
+          setVerificationId(confirmationResult.verificationId);
+          setOtpSent(true);
+          return "OTP sent successfully!";
+        },
+        error: (error) => {
           if (error.code === "auth/too-many-requests") {
-            toast.error(
-              "Too many requests. Please wait a few minutes before trying again."
-            );
-          } else {
-            toast.error("An error occurred. Please try again.");
+            return "Too many requests. Please wait a few minutes before trying again.";
           }
           console.log(error);
-        });
+          return "An error occurred. Please try again.";
+        },
+      });
     } catch (error) {
       console.error("Error during signInWithPhoneNumber:", error);
       toast.error("An error occurred. Please try again.");
@@ -86,30 +116,125 @@ export default function LoginPage() {
   };
 
   const verifyOtp = async () => {
-    if (verificationId == null) {
-      toast.error("Something went wrong!!");
+    if (!verificationId) {
+      toast.error("Verification ID is missing.");
+      console.error("Verification ID is missing");
       return;
     }
+
     const credential = PhoneAuthProvider.credential(verificationId, otp);
-    let toastId = toast.loading("Verifying OTP..");
     try {
       const userCredential = await signInWithCredential(auth, credential);
       const user = userCredential.user;
+>>>>>>> origin/main
 
-      await set(ref(db, "user/" + user.uid), {
-        type: "customer",
+
+  function onSignup() {
+    setLoading(true);
+    onCaptchVerify();
+
+    const appVerifier = window.recaptchaVerifier;
+
+    const formatPh = "+" + ph;
+
+    signInWithPhoneNumber(auth, formatPh, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        setLoading(false);
+        setShowOTP(true);
+        toast.success("OTP sended successfully!");
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
       });
+  }
+
+<<<<<<< HEAD
+  function onOTPVerify() {
+    setLoading(true);
+    window.confirmationResult
+      .confirm(otp)
+      .then(async (res) => {
+        console.log(res);
+        setUser(res.user);
+        setLoading(false);
+        router.push("/register");
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+  }
+
+  return (
+    <section className=" flex items-center justify-center h-screen">
+      <div>
+        <Toaster toastOptions={{ duration: 4000 }} />
+        <div id="recaptcha-container"></div>
+        {user ? (
+          <h2 className="text-center text-white font-medium text-2xl">
+            👍Login Success
+          </h2>
+        ) : (
+          <div className="w-80 flex flex-col gap-4 rounded-lg p-4">
+            <h1 className="text-center leading-normal text-white font-medium text-3xl mb-6"></h1>
+            {showOTP ? (
+              <>
+                <div className="bg-white text-emerald-500 w-fit mx-auto p-4 rounded-full">
+                  <BsFillShieldLockFill size={30} />
+                </div>
+                <label
+                  htmlFor="otp"
+                  className="font-bold text-xl text-white text-center"
+                >
+                  Enter your OTP
+                </label>
+                <OtpInput
+                  value={otp}
+                  onChange={setOtp}
+                  OTPLength={6}
+                  otpType="number"
+                  disabled={false}
+                  autoFocus
+                  className="opt-container "
+                ></OtpInput>
+                <button
+                  onClick={onOTPVerify}
+                  className="bg-emerald-600 w-full flex gap-1 items-center justify-center py-2.5 text-white rounded"
+                >
+                  {loading && (
+                    <CgSpinner size={20} className="mt-1 animate-spin" />
+                  )}
+                  <span>Verify OTP</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="bg-black text-white w-fit mx-auto p-4 rounded-full">
+                  <BsTelephoneFill size={30} />
+                </div>
+                <label
+                  htmlFor=""
+                  className="font-bold text-xl text-black text-center"
+                >
+                  Verify your phone number
+                </label>
+                <PhoneInput country={"in"} value={ph} onChange={setPh} />
+                <button
+                  onClick={onSignup}
+                  className="bg-indigo-500 text-white w-full flex gap-1 items-center justify-center py-2.5  rounded"
+                >
+                  {loading && (
+                    <CgSpinner size={20} className="mt-1 animate-spin" />
+                  )}
+                  <span>Send code via SMS</span>
+=======
       toast.success("User logged in successfully.");
       router.push("/register");
     } catch (error) {
-      if (error.code === "auth/invalid-verification-code") {
-        toast.error("Invalid OTP!!");
-      } else {
-        toast.error("Error during OTP verification: " + error.message);
-      }
+      toast.error("Error during OTP verification: " + error.message);
       console.error("Error during OTP verification:", error);
-    } finally {
-      toast.dismiss(toastId);
     }
   };
 
@@ -131,7 +256,6 @@ export default function LoginPage() {
               <input
                 type="text"
                 value={phoneNumber}
-                disabled={otpSent}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm outline-none"
                 placeholder="Phone number"
@@ -147,7 +271,6 @@ export default function LoginPage() {
 
             {otpSent && (
               <>
-                <br />
                 <label className="font-semibold text-sm text-gray-600 pb-1 block">
                   Verify OTP
                 </label>
@@ -163,12 +286,20 @@ export default function LoginPage() {
                   className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
                 >
                   Submit OTP
+>>>>>>> origin/main
                 </button>
               </>
             )}
           </div>
-        </div>
+        )}
       </div>
+<<<<<<< HEAD
+    </section>
+=======
+      <div id="toast-container" />
     </div>
+>>>>>>> origin/main
   );
-}
+};
+
+export default LoginPage;
