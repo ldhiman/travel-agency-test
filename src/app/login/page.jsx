@@ -54,6 +54,8 @@ export default function LoginPage() {
         loading: "Sending OTP...",
         success: () => {
           setVerificationId(confirmationResult.verificationId);
+          console.log(confirmationResult.verificationId);
+          console.log(verificationId);
           setOtpSent(true);
           return "OTP sent successfully!";
         },
