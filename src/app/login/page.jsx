@@ -35,38 +35,49 @@ export default function LoginPage() {
           callback: () => {
             console.log("reCAPTCHA resolved.");
           },
+          "expired-callback": () => {
+            console.log("reCAPTCHA expired.");
+          },
         }
       );
       window.recaptchaVerifier = recaptchaVerifier;
+
+      // Render the reCAPTCHA widget
+      recaptchaVerifier.render().catch((error) => {
+        console.error("Error rendering reCAPTCHA:", error);
+        toast.error("Failed to initialize reCAPTCHA.");
+      });
     }
   }, [recaptchaContainerRef]);
 
   const requestOtp = async () => {
     const appVerifier = window.recaptchaVerifier;
     try {
-      const confirmationResult = signInWithPhoneNumber(
-        auth,
-        "+91" + phoneNumber,
-        appVerifier
-      );
+      let toastId = toast.loading("Sending OTP..");
+      signInWithPhoneNumber(auth, "+91" + phoneNumber, appVerifier)
+        .then((confirmationResult) => {
+          toast.dismiss(toastId);
+          toast.success("OTP sent successfully!");
 
-      toast.promise(confirmationResult, {
-        loading: "Sending OTP...",
-        success: () => {
-          setVerificationId(confirmationResult.verificationId);
-          console.log(confirmationResult.verificationId);
-          console.log(verificationId);
-          setOtpSent(true);
-          return "OTP sent successfully!";
-        },
-        error: (error) => {
+          if (confirmationResult && confirmationResult.verificationId) {
+            setVerificationId(confirmationResult.verificationId); // Set the verificationId
+            setOtpSent(true);
+            console.log("Verification ID:", confirmationResult.verificationId); // Debugging log
+          } else {
+            console.error("No verification ID found in confirmationResult.");
+            toast.error("Failed to retrieve verification ID.");
+          }
+        })
+        .catch((error) => {
+          toast.dismiss(toastId);
           if (error.code === "auth/too-many-requests") {
-            return "Too many requests. Please wait a few minutes before trying again.";
+            toast.error(
+              "Too many requests. Please wait a few minutes before trying again."
+            );
           }
           console.log(error);
-          return "An error occurred. Please try again.";
-        },
-      });
+          toast.error("An error occurred. Please try again.");
+        });
     } catch (error) {
       console.error("Error during signInWithPhoneNumber:", error);
       toast.error("An error occurred. Please try again.");
@@ -74,27 +85,26 @@ export default function LoginPage() {
   };
 
   const verifyOtp = async () => {
-    if (!verificationId) {
-      toast.error("Verification ID is missing.");
-      console.error("Verification ID is missing");
+    if (verificationId == null) {
+      toast.error("Something went wrong!!");
       return;
     }
-
     const credential = PhoneAuthProvider.credential(verificationId, otp);
+    let toastId = toast.loading("Verifying OTP..");
     try {
       const userCredential = await signInWithCredential(auth, credential);
       const user = userCredential.user;
 
-      await set(ref(db, "users/" + user.uid), {
-        phoneNumber: user.phoneNumber,
+      await set(ref(db, "user/" + user.uid), {
         type: "customer",
       });
-
       toast.success("User logged in successfully.");
       router.push("/register");
     } catch (error) {
       toast.error("Error during OTP verification: " + error.message);
       console.error("Error during OTP verification:", error);
+    } finally {
+      toast.dismiss(toastId);
     }
   };
 
@@ -116,6 +126,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 value={phoneNumber}
+                disabled={otpSent}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm outline-none"
                 placeholder="Phone number"
@@ -152,7 +163,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div id="toast-container" />
     </div>
   );
 }
