@@ -90,7 +90,7 @@ export default function RegisterPage() {
         name: formData.name,
         email: formData.email,
         dob: formData.dob,
-        contact: formData.contact,
+        phone: formData.contact,
       });
 
       const typeRef = ref(db, `user/${uid}`);
