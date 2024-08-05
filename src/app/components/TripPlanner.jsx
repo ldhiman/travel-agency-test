@@ -114,12 +114,12 @@ const TripPlanner = () => {
     }
 
     if (!sourceCoords) {
-      setError("Please Select Source Location from Given Options.");
+      setError("Please select Source Location from Given Options.");
       return;
     }
 
     if (!destinationCoords) {
-      setError("Please Select Destination Location from Given Options.");
+      setError("Please select Destination Location from Given Options.");
       return;
     }
 
@@ -199,11 +199,13 @@ const TripPlanner = () => {
       const newDatetime = new Date(pickupDatetime);
       newDatetime.setHours(time.getHours());
       newDatetime.setMinutes(time.getMinutes());
-      if (isValidDatetime(newDatetime)) {
-        setPickupDatetime(newDatetime);
+
+      // Check if the new pickup time is at least 30 minutes in the future
+      const minPickupDatetime = getMinTime();
+      if (newDatetime < minPickupDatetime) {
+        setPickupDatetime(minPickupDatetime);
       } else {
-        console.log("Selected time is less than 30 minutes from now.");
-        setPickupDatetime(getMinTime());
+        setPickupDatetime(newDatetime);
       }
     }
   };
@@ -222,11 +224,12 @@ const TripPlanner = () => {
       const newDatetime = new Date(returnDatetime);
       newDatetime.setHours(time.getHours());
       newDatetime.setMinutes(time.getMinutes());
-      if (isValidDatetime(newDatetime)) {
-        setReturnDatetime(newDatetime);
+
+      // Check if the return time is after the pickup time
+      if (newDatetime <= pickupDatetime) {
+        setReturnDatetime(new Date(pickupDatetime.getTime() + 30 * 60000));
       } else {
-        console.log("Selected time is less than 30 minutes from now.");
-        setReturnDatetime(getMinTime());
+        setReturnDatetime(newDatetime);
       }
     }
   };
@@ -285,7 +288,6 @@ const TripPlanner = () => {
           <TimePickerField
             id="pickup-time-field"
             label="PICK UP TIME"
-            value={pickupDatetime ? pickupDatetime : null}
             onChange={handlePickupTimeChange}
             disabled={!pickupDatetime} // Disable until date is selected
           />
