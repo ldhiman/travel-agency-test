@@ -95,7 +95,7 @@ export default function RegisterPage() {
 
       const typeRef = ref(db, `user/${uid}`);
       await set(typeRef, {
-        type: "customer",
+        customer: true,
       });
       toast.success("Data Saved!!");
       console.log("Data saved successfully!");
