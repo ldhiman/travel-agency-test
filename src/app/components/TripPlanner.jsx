@@ -4,24 +4,51 @@ import React, { useState, useEffect, useCallback } from "react";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import TextField from "@mui/material/TextField";
 import { processTripData } from "../api/processTripData";
-import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import {
+  useLoadScript,
+  Autocomplete,
+  Marker,
+  GoogleMap,
+} from "@react-google-maps/api";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import Modal from "@mui/material/Modal";
+import IconButton from "@mui/material/IconButton";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import CloseIcon from "@mui/icons-material/Close";
+import toast from "react-hot-toast";
+import MyLocationIcon from "@mui/icons-material/MyLocation"; // Icon for current location
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
 
 const libraries = ["places"];
+const center = { lat: 20.5937, lng: 78.9629 }; // Default center
 
 const TripPlanner = () => {
-  const [autocompleteSource, setAutocompleteSource] = useState(null);
-  const [autocompleteDestination, setAutocompleteDestination] = useState(null);
   const [pickupDatetime, setPickupDatetime] = useState(null);
   const [returnDatetime, setReturnDatetime] = useState(null);
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [sourceCoords, setSourceCoords] = useState(null);
   const [destinationCoords, setDestinationCoords] = useState(null);
+  const [sourceLocationName, setSourceLocationName] = useState("");
+  const [destinationLocationName, setDestinationLocationName] = useState("");
   const [tripType, setTripType] = useState("ONE WAY");
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState(center);
   const [error, setError] = useState("");
+  const [mapOpen, setMapOpen] = useState(false);
+  const [currentMapType, setCurrentMapType] = useState(null);
+  const [sourceAutocomplete, setSourceAutocomplete] = useState(null);
+  const [destinationAutocomplete, setDestinationAutocomplete] = useState(null);
+  const [mapRef, setMapRef] = useState(null);
+  const [currentLocationMarker, setCurrentLocationMarker] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState("");
+
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
     libraries,
@@ -38,106 +65,71 @@ const TripPlanner = () => {
     );
   }, []);
 
-  const onPlaceChanged = (field) => {
-    let place;
-    if (field === "source" && autocompleteSource) {
-      place = autocompleteSource.getPlace();
-      if (place && place.geometry) {
-        setSource(place.formatted_address || "");
-        setSourceCoords({
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
-        });
+  const getAddressFromCoords = useCallback((coords, callback) => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: coords }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        callback(results[0].formatted_address);
+      } else {
+        callback("Unknown location");
       }
-    } else if (field === "destination" && autocompleteDestination) {
-      place = autocompleteDestination.getPlace();
-      if (place && place.geometry) {
-        setDestination(place.formatted_address || "");
-        setDestinationCoords({
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
-        });
+    });
+  }, []);
+
+  const handleMapClick = (e) => {
+    const coords = {
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+    };
+    let toastID = toast.loading("Selecting Location..");
+    getAddressFromCoords(coords, (address) => {
+      toast.success(`Location Selected!!`);
+      toast.dismiss(toastID);
+      setSelectedAddress(address);
+      setSelectedLocation(coords);
+      if (currentMapType === "source") {
+        setSourceCoords(coords);
+        setSourceLocationName(address);
+        setSource(address);
+      } else if (currentMapType === "destination") {
+        setDestinationCoords(coords);
+        setDestinationLocationName(address);
+        setDestination(address);
       }
-    }
+      setIsDialogOpen(true); // Open the dialog
+      // setMapOpen(false); // Close the map modal after selection
+    });
   };
 
-  const getAutocompleteOptions = useCallback(() => {
-    const baseOptions = {
-      componentRestrictions: { country: "in" },
-    };
-
-    if (tripType === "AIRPORT") {
-      return { ...baseOptions, types: ["airport"] };
-    }
-
-    if (tripType === "LOCAL") {
-      return {
-        ...baseOptions,
-        types: ["local"],
-        ...(userLocation && {
-          location: new window.google.maps.LatLng(
-            userLocation.lat,
-            userLocation.lng
-          ),
-          radius: 10000, // 10KM
-        }),
-      };
-    }
-
-    return {
-      ...baseOptions,
-      ...(userLocation && {
-        bounds: new window.google.maps.LatLngBounds(
-          new window.google.maps.LatLng(
-            userLocation.lat - 0.1,
-            userLocation.lng - 0.1
-          ),
-          new window.google.maps.LatLng(
-            userLocation.lat + 0.1,
-            userLocation.lng + 0.1
-          )
-        ),
-      }),
-    };
-  }, [tripType, userLocation]);
+  const openMapModal = (type) => {
+    setCurrentMapType(type);
+    setMapOpen(true);
+  };
 
   const handleExploreCabs = () => {
-    // Validate source and destination
-    if (!source) {
+    if (!sourceCoords) {
       setError("Source location is required.");
       return;
     }
 
-    if (!destination) {
+    if (!destinationCoords) {
       setError("Destination location is required.");
       return;
     }
 
-    if (!sourceCoords) {
-      setError("Please select Source Location from Given Options.");
-      return;
-    }
-
-    if (!destinationCoords) {
-      setError("Please select Destination Location from Given Options.");
-      return;
-    }
-
-    // Validate pickup datetime
     if (!pickupDatetime) {
       setError("Pickup date and time are required.");
       return;
     }
 
     const now = new Date();
-    const minPickupDatetime = new Date(now.getTime() + 30 * 60000); // 30 minutes from now
+    const minPickupDatetime = new Date(now.getTime() + 30 * 60000);
 
     if (pickupDatetime < minPickupDatetime) {
       setError("Pickup date and time must be at least 30 minutes from now.");
       return;
     }
 
-    // Validate return datetime for ROUND TRIP
     if (tripType === "ROUND TRIP") {
       if (!returnDatetime) {
         setError("Return date and time are required for a round trip.");
@@ -152,7 +144,6 @@ const TripPlanner = () => {
       }
     }
 
-    // If no errors, proceed with processing the trip data
     setError("");
 
     const tripData = {
@@ -171,19 +162,7 @@ const TripPlanner = () => {
     processTripData(tripData);
   };
 
-  const getMinTime = () => {
-    const now = new Date();
-    return new Date(now.getTime() + 30 * 60000); // 30 minutes from now
-  };
-
-  const isValidDatetime = (datetime) => {
-    if (!pickupDatetime) return true; // No date-time selected yet
-
-    const minTime = new Date(pickupDatetime);
-    minTime.setMinutes(minTime.getMinutes() + 30);
-
-    return datetime >= minTime;
-  };
+  const getMinTime = () => new Date(new Date().getTime() + 30 * 60000);
 
   const handlePickupDateChange = (date) => {
     setPickupDatetime((prev) => {
@@ -200,7 +179,6 @@ const TripPlanner = () => {
       newDatetime.setHours(time.getHours());
       newDatetime.setMinutes(time.getMinutes());
 
-      // Check if the new pickup time is at least 30 minutes in the future
       const minPickupDatetime = getMinTime();
       if (newDatetime < minPickupDatetime) {
         setPickupDatetime(minPickupDatetime);
@@ -225,7 +203,6 @@ const TripPlanner = () => {
       newDatetime.setHours(time.getHours());
       newDatetime.setMinutes(time.getMinutes());
 
-      // Check if the return time is after the pickup time
       if (newDatetime <= pickupDatetime) {
         setReturnDatetime(new Date(pickupDatetime.getTime() + 30 * 60000));
       } else {
@@ -234,23 +211,75 @@ const TripPlanner = () => {
     }
   };
 
-  if (!isLoaded) return <div>Loading...</div>;
+  const handleCurrentLocationClick = () => {
+    if (mapRef) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const newLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+
+            // Pan to the new location with animation
+            mapRef.panTo(newLocation);
+            mapRef.setZoom(15); // Optionally adjust zoom level
+
+            // Update user location
+            setUserLocation(newLocation);
+
+            // Add or update marker
+            if (currentLocationMarker) {
+              currentLocationMarker.setPosition(newLocation);
+            } else {
+              const marker = new window.google.maps.Marker({
+                position: newLocation,
+                map: mapRef,
+                title: "Your Location",
+                icon: "http://maps.google.com/mapfiles/ms/icons/POI.png", // Optional: custom icon
+              });
+              setCurrentLocationMarker(marker);
+            }
+          },
+          (error) => {
+            if (error.code === error.PERMISSION_DENIED) {
+              alert("Location access denied. Please enable location services.");
+            } else {
+              console.error("Error getting user location:", error.message);
+            }
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+  };
+
+  if (!isLoaded) return <div className="text-center p-4">Loading...</div>;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div className="flex flex-col p-4">
+      <div className="p-6">
         {error && (
-          <div className="bg-red-500 text-white p-2 rounded mb-4">{error}</div>
+          <div className="bg-red-500 text-white p-3 rounded mb-6 text-center">
+            {error}
+          </div>
         )}
-        <div className="flex flex-row flex-wrap">
+
+        <div className="flex mb-6">
           {["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT"].map((type) => (
             <button
               key={type}
               onClick={() => setTripType(type)}
-              className={`inline-flex mx-2 my-2 text-sm text-white border-0 py-1 px-4 rounded-full focus:outline-none shadow-md ${
+              className={`mx-2 my-2 py-2 px-4 rounded-full text-white font-small focus:outline-none shadow-md ${
                 tripType === type
-                  ? "bg-indigo-600"
-                  : "bg-indigo-500 hover:bg-indigo-600"
+                  ? "bg-indigo-700"
+                  : "bg-indigo-400 hover:bg-indigo-500"
               }`}
             >
               {type}
@@ -258,29 +287,95 @@ const TripPlanner = () => {
           ))}
         </div>
 
-        <div className="flex flex-col">
-          <AutocompleteField
-            id="source-field"
-            label="SOURCE"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-            onPlaceChanged={() => onPlaceChanged("source")}
-            options={getAutocompleteOptions()}
-            setAutocomplete={setAutocompleteSource}
-          />
-          <AutocompleteField
-            id="destination-field"
-            label="DESTINATION"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            onPlaceChanged={() => onPlaceChanged("destination")}
-            options={getAutocompleteOptions()}
-            setAutocomplete={setAutocompleteDestination}
-          />
+        <div className="mb-6">
+          <div className="relative mb-4 w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              SOURCE
+            </label>
+            <div className="flex items-center w-full">
+              <Autocomplete
+                onLoad={setSourceAutocomplete}
+                onPlaceChanged={() => {
+                  const place = sourceAutocomplete.getPlace();
+                  if (place && place.geometry) {
+                    setSource(place.formatted_address || "");
+                    setSourceCoords({
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng(),
+                    });
+                    setSourceLocationName(place.formatted_address || "");
+                  }
+                }}
+                options={getAutocompleteOptions()}
+              >
+                <TextField
+                  className="w-full"
+                  placeholder="Search for source"
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                />
+              </Autocomplete>
+              {tripType !== "AIRPORT" && (
+                <IconButton
+                  onClick={() => openMapModal("source")}
+                  color="primary"
+                >
+                  <LocationOnIcon />
+                </IconButton>
+              )}
+            </div>
+            {sourceLocationName && (
+              <div className="mt-2 text-sm text-gray-500">
+                {sourceLocationName}
+              </div>
+            )}
+          </div>
+
+          <div className="relative mb-4 w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              DESTINATION
+            </label>
+            <div className="flex items-center w-full">
+              <Autocomplete
+                onLoad={setDestinationAutocomplete}
+                onPlaceChanged={() => {
+                  const place = destinationAutocomplete.getPlace();
+                  if (place && place.geometry) {
+                    setDestination(place.formatted_address || "");
+                    setDestinationCoords({
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng(),
+                    });
+                    setDestinationLocationName(place.formatted_address || "");
+                  }
+                }}
+                options={getAutocompleteOptions()}
+              >
+                <TextField
+                  className="w-full"
+                  placeholder="Search for destination"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                />
+              </Autocomplete>
+              <IconButton
+                onClick={() => openMapModal("destination")}
+                color="primary"
+              >
+                <LocationOnIcon />
+              </IconButton>
+            </div>
+            {destinationLocationName && (
+              <div className="mt-2 text-sm text-gray-500">
+                {destinationLocationName}
+              </div>
+            )}
+          </div>
+
           <DatePickerField
             id="pickup-date-field"
             label="PICK UP DATE"
-            value={pickupDatetime ? pickupDatetime : null}
+            value={pickupDatetime}
             onChange={handlePickupDateChange}
             minDate={new Date()} // Disables past dates
           />
@@ -297,97 +392,150 @@ const TripPlanner = () => {
               <DatePickerField
                 id="return-date-field"
                 label="RETURN DATE"
-                value={returnDatetime ? returnDatetime : null}
-                minDate={
-                  pickupDatetime
-                    ? new Date(pickupDatetime.getTime())
-                    : new Date()
-                }
+                value={returnDatetime}
                 onChange={handleReturnDateChange}
+                minDate={pickupDatetime ? pickupDatetime : new Date()} // Min date should be pickup date
               />
               <TimePickerField
                 id="return-time-field"
                 label="RETURN TIME"
-                value={returnDatetime ? returnDatetime : null}
                 onChange={handleReturnTimeChange}
                 disabled={!returnDatetime} // Disable until return date is selected
               />
             </>
           )}
+
           <button
             onClick={handleExploreCabs}
-            className="mt-4 inline-flex items-center text-white bg-indigo-600 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-700 rounded text-lg"
+            className="mt-6 py-2 px-4 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none"
           >
             EXPLORE CABS
           </button>
         </div>
+
+        <Modal
+          open={mapOpen}
+          onClose={() => setMapOpen(false)}
+          aria-labelledby="map-modal-title"
+          aria-describedby="map-modal-description"
+        >
+          <div className="w-full h-full bg-white p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 id="map-modal-title" className="text-lg font-semibold">
+                Select Location on Map
+              </h2>
+              <IconButton onClick={() => setMapOpen(false)}>
+                <CloseIcon />
+              </IconButton>
+            </div>
+            <div className="w-full h-[90%]">
+              <GoogleMap
+                mapContainerStyle={{ width: "100%", height: "100%" }}
+                center={
+                  currentMapType === "source"
+                    ? sourceCoords || userLocation
+                    : destinationCoords || userLocation
+                }
+                zoom={13}
+                onClick={handleMapClick}
+                onLoad={(map) => setMapRef(map)}
+              >
+                {sourceCoords && (
+                  <Marker
+                    position={sourceCoords}
+                    icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    title="Source"
+                  />
+                )}
+                {destinationCoords && (
+                  <Marker
+                    position={destinationCoords}
+                    icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    title="Destination"
+                  />
+                )}
+                <button
+                  onClick={handleCurrentLocationClick}
+                  className="absolute bottom-4 right-4 p-2 bg-white rounded-full shadow-md border border-gray-300"
+                >
+                  <MyLocationIcon />
+                </button>
+              </GoogleMap>
+            </div>
+          </div>
+        </Modal>
+        <Dialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          aria-labelledby="confirm-location-dialog-title"
+          aria-describedby="confirm-location-dialog-description"
+        >
+          <DialogTitle id="confirm-location-dialog-title">
+            Confirm Location
+          </DialogTitle>
+          <DialogContent>
+            <p>Address: {selectedAddress}</p>
+            <p>Latitude: {selectedLocation?.lat}</p>
+            <p>Longitude: {selectedLocation?.lng}</p>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setMapOpen(false);
+                setIsDialogOpen(false); // Close the dialog
+              }}
+              color="primary"
+            >
+              Confirm
+            </Button>
+            <Button onClick={() => setIsDialogOpen(false)} color="secondary">
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </LocalizationProvider>
   );
 };
 
-// Extracted Components
-const AutocompleteField = ({
-  id,
-  label,
-  value,
-  onChange,
-  onPlaceChanged,
-  options,
-  setAutocomplete,
-}) => (
-  <div className="relative ml-4 md:w-full lg:w-full xl:w-3/4">
-    <label htmlFor={id} className="leading-7 text-sm text-gray-600">
-      {label}
-    </label>
-    <Autocomplete
-      onLoad={setAutocomplete}
-      onPlaceChanged={onPlaceChanged}
-      options={options}
-    >
-      <input
-        type="text"
-        id={id}
-        className="w-full bg-white rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 text-base outline-none text-gray-700 py-3 px-4 leading-8 transition-colors duration-200 ease-in-out placeholder-gray-400"
-        placeholder="Search places"
-        value={value || ""}
-        onChange={onChange}
-      />
-    </Autocomplete>
-  </div>
-);
-
 const DatePickerField = ({ id, label, value, onChange, minDate }) => (
-  <div className="relative flex flex-col ml-4 md:w-full lg:w-full xl:w-3/4">
-    <label htmlFor={id} className="leading-7 text-sm text-gray-600">
+  <div className="relative mb-4 w-full">
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-gray-700 mb-2"
+    >
       {label}
     </label>
     <DatePicker
+      id={id}
       value={value}
-      onChange={(date) => {
-        onChange(date);
-      }}
-      renderInput={(params) => <TextField {...params} fullWidth />}
+      onChange={onChange}
       minDate={minDate}
-      inputFormat="dd/MM/yyyy"
-      placeholder={`Select ${label.toLowerCase()}`}
+      renderInput={(params) => <TextField {...params} fullWidth />}
     />
   </div>
 );
 
-const TimePickerField = ({ id, label, value, onChange, disabled }) => (
-  <div className="relative flex flex-col ml-4 md:w-full lg:w-full xl:w-3/4">
-    <label htmlFor={id} className="leading-7 text-sm text-gray-600">
+const TimePickerField = ({ id, label, onChange, disabled }) => (
+  <div className="relative mb-4 w-full">
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-gray-700 mb-2"
+    >
       {label}
     </label>
     <TimePicker
-      value={value}
+      id={id}
       onChange={onChange}
-      renderInput={(params) => <TextField {...params} fullWidth />}
       disabled={disabled}
-      ampm={true} // Optional: If you want to use 24-hour time format
+      renderInput={(params) => <TextField {...params} fullWidth />}
     />
   </div>
 );
+
+const getAutocompleteOptions = () => ({
+  types: ["geocode"],
+  componentRestrictions: { country: "in" }, // Set your desired country code
+});
 
 export default TripPlanner;
