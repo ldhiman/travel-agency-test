@@ -23,6 +23,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
+import { useRouter } from "next/navigation";
 
 const libraries = ["places"];
 const center = { lat: 20.5937, lng: 78.9629 }; // Default center
@@ -48,6 +49,7 @@ const TripPlanner = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState("");
+  const router = useRouter();
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
@@ -106,7 +108,7 @@ const TripPlanner = () => {
     setMapOpen(true);
   };
 
-  const handleExploreCabs = () => {
+  const handleExploreCabs = async () => {
     if (!sourceCoords) {
       setError("Source location is required.");
       return;
@@ -158,8 +160,26 @@ const TripPlanner = () => {
       }),
     };
 
-    console.log("Trip Data:", JSON.stringify(tripData, null, 2));
-    processTripData(tripData);
+    console.log("Trip Data:", JSON.stringify(tripData));
+    const distanceData = await processTripData(tripData);
+
+    // Check for errors
+    if (distanceData.error) {
+      toast.error(distanceData.error);
+      console.error(distanceData.error);
+      setError(distanceData.error);
+      return;
+    }
+
+    // Add distance data to the trip data
+    const completeTripData = {
+      ...tripData,
+      distanceData: distanceData, // Assuming distanceData contains the details you need
+    };
+    router.push(
+      "/cabSelection?" +
+        new URLSearchParams({ data: btoa(JSON.stringify(completeTripData)) })
+    );
   };
 
   const getMinTime = () => new Date(new Date().getTime() + 30 * 60000);

@@ -45,10 +45,17 @@ export default function RegisterPage() {
 
   // Date picker handler
   const handleDateChange = (date) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      dob: date ? date.toISOString().split("T")[0] : "",
-    }));
+    try {
+      setFormData((prevData) => ({
+        ...prevData,
+        dob: date ? date.toISOString().split("T")[0] : "",
+      }));
+    } catch (err) {
+      setFormData((prevData) => ({
+        ...prevData,
+        dob: "",
+      }));
+    }
   };
 
   // Check if user is at least 18 years old
