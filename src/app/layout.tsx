@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { Toaster } from "react-hot-toast";
+import { Suspense } from "react";
+import Loading from "./components/Loading"; // Import the Loading component
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +23,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Navbar />
-        {children}
+        <Suspense fallback={<Loading />}>{children}</Suspense>
         <Toaster position="bottom-center" />
-        <Footer />{" "}
+        <Footer />
       </body>
     </html>
   );
