@@ -1,0 +1,39 @@
+/* styles.module.css */
+
+.container {
+    display: flex;
+    margin-left: 1rem; /* ml-3 */
+    padding-left: 1rem; /* pl-3 */
+    padding-top: 0.5rem; /* py-2 (adjust if needed) */
+    padding-bottom: 0.5rem; /* py-2 (adjust if needed) */
+    border-left: 2px solid black; /* border-gray-200 */
+    gap: 0.5rem; /* space-x-2 */
+    position: relative; /* For logo-container positioning */
+}
+
+.logo {
+    width: 30px;
+    height: 30px;
+    background-color: #007bff; /* Adjust color if needed */
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.details {
+    width: 160px;
+    height: 80px;
+    display: none;
+    position: absolute;
+    top: 120%; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.container:hover .details {
+    display: block;
+}
