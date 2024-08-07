@@ -58,6 +58,7 @@ const ConfirmCab = () => {
               <p>Total Cost: ₹ {cabData.totalCost}</p>
               <p>Passengers: {cabData.passengers}</p>
               <p>Luggage: {cabData.luggage}</p>
+              <button className="bg-blue-500 text-white">Confirm Trip</button>
             </div>
           </>
         ) : (

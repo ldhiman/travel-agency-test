@@ -545,7 +545,7 @@ const CabSelection = () => {
                     handlerCabSelection(
                       "Value",
                       "TempoTraveller",
-                      tempoTravllerTotalTotal,
+                      tempoTravllerTotal,
                       formattedDuration,
                       12,
                       10
