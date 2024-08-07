@@ -97,6 +97,7 @@ export default function LoginPage() {
 
       await set(ref(db, "user/" + user.uid), {
         type: "customer",
+        customer: true
       });
       toast.success("User logged in successfully.");
       router.push("/register");
