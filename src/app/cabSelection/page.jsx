@@ -1,18 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import styles from "./styles.module.css";
+import styles from "./style.module.css";
 
 const CabSelection = () => {
   const searchParams = useSearchParams();
   const [fullTripData, setFullTripData] = useState(null);
+  const [vehicleTag, setVehicleTag] = useState("");
   const [vehicleType, setVehicleType] = useState("");
   const [passengers, setPassengers] = useState("");
   const [luggage, setLuggage] = useState("");
+  const router = useRouter();
 
-  const cabBooked = {
+  let cabData = {
+    vehicleTag,
     vehicleType,
     passengers,
     luggage,
@@ -76,7 +79,7 @@ const CabSelection = () => {
   // Call to get totol fare
   const compactTotal = calculateTotalFare("Compact");
   const sedanTotal = calculateTotalFare("Sedan");
-  const SuvTotal = calculateTotalFare("SUV");
+  const suvTotal = calculateTotalFare("SUV");
   const tempoTravllerTotal = calculateTotalFare("TempoTraveller");
 
   // Get the duration in minutes from fullTripData
@@ -86,6 +89,34 @@ const CabSelection = () => {
 
   // Convert duration to hours and minutes
   const formattedDuration = convertMinutesToHoursAndMinutes(durationInMinutes);
+
+  // Handler function for redirection
+  const handlerCabSelection = (
+    vehicleTag,
+    vehicleType,
+    totalCost,
+    duration,
+    passengers,
+    luggage
+  ) => {
+    cabData = {
+      ...fullTripData,
+      vehicleTag,
+      vehicleType,
+      totalCost,
+      duration,
+      passengers,
+      luggage,
+    };
+
+    console.log("Cab Data:", cabData);
+
+    // Use `router.push` to navigate to the confirmCab page with encoded data
+    router.push(
+      "/confirmCab?" +
+        new URLSearchParams({ data: btoa(JSON.stringify(cabData)) }).toString()
+    );
+  };
 
   return (
     <>
@@ -121,7 +152,19 @@ const CabSelection = () => {
             <section className="text-gray-600 body-font flex flex-col overflow-hidden">
               <div className="container flex flex-col items-center  px-5 py-24 mx-auto">
                 {/* Compact */}
-                <div className="flex flex-row space-x-10 items-center">
+                <div
+                  className="flex flex-row space-x-10 items-center"
+                  onClick={() =>
+                    handlerCabSelection(
+                      "Economy",
+                      "Compact",
+                      compactTotal,
+                      formattedDuration,
+                      4,
+                      1
+                    )
+                  }
+                >
                   <Image
                     alt="ecommerce"
                     src="/cars.jpg"
@@ -239,7 +282,19 @@ const CabSelection = () => {
                   </div>
                 </div>
                 {/* Sedan */}
-                <div className="flex  mt-5 flex-row space-x-10 items-center">
+                <div
+                  className="flex  mt-5 flex-row space-x-10 items-center"
+                  onClick={() =>
+                    handlerCabSelection(
+                      "Economy",
+                      "Sedan",
+                      sedanTotalTotal,
+                      formattedDuration,
+                      4,
+                      1
+                    )
+                  }
+                >
                   <Image
                     alt="ecommerce"
                     src="/cars.jpg"
@@ -356,7 +411,19 @@ const CabSelection = () => {
                   </div>
                 </div>
                 {/* SUV */}
-                <div className="flex  mt-5 flex-row space-x-10 items-center">
+                <div
+                  className="flex  mt-5 flex-row space-x-10 items-center"
+                  onClick={() =>
+                    handlerCabSelection(
+                      "Economy",
+                      "SUV",
+                      suvTotal,
+                      formattedDuration,
+                      6,
+                      3
+                    )
+                  }
+                >
                   <Image
                     alt="ecommerce"
                     src="/cars.jpg"
@@ -373,7 +440,7 @@ const CabSelection = () => {
                     </h1>
                     <div className="flex flex-row items-center">
                       <span className="title-font font-medium text-2xl text-gray-900">
-                        ₹ {SuvTotal}
+                        ₹ {suvTotal}
                       </span>
                       <span className={styles.container}>
                         <div className={styles.logo}>
@@ -472,7 +539,19 @@ const CabSelection = () => {
                   </div>
                 </div>
                 {/* TempoTraveller */}
-                <div className="flex  mt-5 flex-row space-x-10 items-center">
+                <div
+                  className="flex  mt-5 flex-row space-x-10 items-center"
+                  onClick={() =>
+                    handlerCabSelection(
+                      "Value",
+                      "TempoTraveller",
+                      tempoTravllerTotal,
+                      formattedDuration,
+                      12,
+                      10
+                    )
+                  }
+                >
                   <Image
                     alt="ecommerce"
                     src="/cars.jpg"
