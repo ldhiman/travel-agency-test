@@ -316,14 +316,16 @@ const TripPlanner = () => {
               <Autocomplete
                 onLoad={setSourceAutocomplete}
                 onPlaceChanged={() => {
-                  const place = sourceAutocomplete.getPlace();
-                  if (place && place.geometry) {
-                    setSource(place.formatted_address || "");
-                    setSourceCoords({
-                      lat: place.geometry.location.lat(),
-                      lng: place.geometry.location.lng(),
-                    });
-                    setSourceLocationName(place.formatted_address || "");
+                  if (sourceAutocomplete) {
+                    const place = sourceAutocomplete.getPlace();
+                    if (place && place.geometry) {
+                      setSource(place.formatted_address || "");
+                      setSourceCoords({
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                      });
+                      setSourceLocationName(place.formatted_address || "");
+                    }
                   }
                 }}
                 options={getAutocompleteOptions()}
@@ -359,14 +361,16 @@ const TripPlanner = () => {
               <Autocomplete
                 onLoad={setDestinationAutocomplete}
                 onPlaceChanged={() => {
-                  const place = destinationAutocomplete.getPlace();
-                  if (place && place.geometry) {
-                    setDestination(place.formatted_address || "");
-                    setDestinationCoords({
-                      lat: place.geometry.location.lat(),
-                      lng: place.geometry.location.lng(),
-                    });
-                    setDestinationLocationName(place.formatted_address || "");
+                  if (destinationAutocomplete) {
+                    const place = destinationAutocomplete.getPlace();
+                    if (place && place.geometry) {
+                      setDestination(place.formatted_address || "");
+                      setDestinationCoords({
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                      });
+                      setDestinationLocationName(place.formatted_address || "");
+                    }
                   }
                 }}
                 options={getAutocompleteOptions()}
