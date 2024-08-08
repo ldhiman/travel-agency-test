@@ -1,8 +1,9 @@
 "use client";
 
-import { duration } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { ref,set } from "firebase/database";
+import { db } from "../firebase";
 
 const ConfirmCab = () => {
   const searchParams = useSearchParams();
@@ -27,6 +28,22 @@ const ConfirmCab = () => {
 
     fetchCabData();
   }, [searchParams]);
+
+  const saveTripData = () => {
+    if (!cabData) {
+      console.error("No trip data to save");
+      return;
+    }
+    // Write the trip data to the Firebase
+    const tripRef = ref(db, 'trips/' + cabData.vehicleType);
+    set(tripRef, cabData)
+      .then(() => {
+        console.log("Trip data saved successfully.");
+      })
+      .catch((error) => {
+        console.error("Failed to save trip data", error);
+      });
+  };
 
   return (
     <>
@@ -58,7 +75,7 @@ const ConfirmCab = () => {
               <p>Total Cost: ₹ {cabData.totalCost}</p>
               <p>Passengers: {cabData.passengers}</p>
               <p>Luggage: {cabData.luggage}</p>
-              <button className="bg-blue-500 text-white">Confirm Trip</button>
+              <button className="bg-blue-500 text-white" onClick={saveTripData}>Confirm Trip</button>
             </div>
           </>
         ) : (

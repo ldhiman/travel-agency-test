@@ -79,7 +79,7 @@ const CabSelection = () => {
   // Call to get totol fare
   const compactTotal = calculateTotalFare("Compact");
   const sedanTotal = calculateTotalFare("Sedan");
-  const SuvTotal = calculateTotalFare("SUV");
+  const suvTotal = calculateTotalFare("SUV");
   const tempoTravllerTotal = calculateTotalFare("TempoTraveller");
 
   // Get the duration in minutes from fullTripData
@@ -417,7 +417,7 @@ const CabSelection = () => {
                     handlerCabSelection(
                       "Economy",
                       "SUV",
-                      SuvTotalTotal,
+                      suvTotal,
                       formattedDuration,
                       6,
                       3
@@ -440,7 +440,7 @@ const CabSelection = () => {
                     </h1>
                     <div className="flex flex-row items-center">
                       <span className="title-font font-medium text-2xl text-gray-900">
-                        ₹ {SuvTotal}
+                        ₹ {suvTotal}
                       </span>
                       <span className={styles.container}>
                         <div className={styles.logo}>
