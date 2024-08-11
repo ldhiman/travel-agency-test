@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
 import Loading from "./components/Loading"; // Import the Loading component
+import { AuthProvider } from "../context/authContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +23,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar />
-        <Suspense fallback={<Loading />}>{children}</Suspense>
-        <Toaster position="bottom-center" />
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+          <Toaster position="bottom-center" />
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

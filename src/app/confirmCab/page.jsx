@@ -64,7 +64,7 @@ const ConfirmCab = () => {
 
     const updatedCabData = {
       ...cabData,
-      uid: uid,
+      uid,
       status: "booked",
       bookedTime: new Date().getTime(),
     };
@@ -84,7 +84,12 @@ const ConfirmCab = () => {
           .then(() => {
             console.log("Trip ID saved under customer trips.");
             toast.success("Trip confirmed successfully!");
-            router.push("/history");
+            router.push(
+              "/history?" +
+                new URLSearchParams({
+                  data: btoa(JSON.stringify(updatedCabData)),
+                }).toString()
+            );
           })
           .catch((error) => {
             console.error("Failed to save trip ID under customer trips", error);
