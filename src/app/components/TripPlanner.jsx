@@ -49,6 +49,9 @@ const TripPlanner = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState("");
+
+  const [loading, setLoading] = useState(false); // Add state for loading
+
   const router = useRouter();
 
   const { isLoaded } = useLoadScript({
@@ -147,6 +150,7 @@ const TripPlanner = () => {
     }
 
     setError("");
+    setLoading(true); // Set loading to true
 
     const tripData = {
       tripType,
@@ -161,25 +165,32 @@ const TripPlanner = () => {
     };
 
     console.log("Trip Data:", JSON.stringify(tripData));
-    const distanceData = await processTripData(tripData);
+    try {
+      const distanceData = await processTripData(tripData);
 
-    // Check for errors
-    if (distanceData.error) {
-      toast.error(distanceData.error);
-      console.error(distanceData.error);
-      setError(distanceData.error);
-      return;
+      // Check for errors
+      if (distanceData.error) {
+        toast.error(distanceData.error);
+        console.error(distanceData.error);
+        setError(distanceData.error);
+        return;
+      }
+
+      // Add distance data to the trip data
+      const completeTripData = {
+        ...tripData,
+        distanceData: distanceData, // Assuming distanceData contains the details you need
+      };
+      router.push(
+        "/cabSelection?" +
+          new URLSearchParams({ data: btoa(JSON.stringify(completeTripData)) })
+      );
+    } catch (error) {
+      toast.error("An error occurred while processing the trip.");
+      console.error(error);
+    } finally {
+      setLoading(false); // Set loading to false
     }
-
-    // Add distance data to the trip data
-    const completeTripData = {
-      ...tripData,
-      distanceData: distanceData, // Assuming distanceData contains the details you need
-    };
-    router.push(
-      "/cabSelection?" +
-        new URLSearchParams({ data: btoa(JSON.stringify(completeTripData)) })
-    );
   };
 
   const getMinTime = () => new Date(new Date().getTime() + 30 * 60000);
@@ -436,6 +447,18 @@ const TripPlanner = () => {
             EXPLORE CABS
           </button>
         </div>
+
+        {loading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="relative">
+                <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
+                <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-gray-200 border-solid rounded-full animate-spin opacity-50"></div>
+              </div>
+              <p className="text-white text-lg font-semibold">Loading...</p>
+            </div>
+          </div>
+        )}
 
         <Modal
           open={mapOpen}

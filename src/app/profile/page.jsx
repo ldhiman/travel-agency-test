@@ -26,6 +26,10 @@ const ProfilePage = () => {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [tripToCancel, setTripToCancel] = useState(null);
 
+  // Progress states
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState("Loading...");
+
   // Maps status IDs to their human-readable names and attributes
   const formatStatus = (id) => {
     switch (id) {
@@ -94,6 +98,10 @@ const ProfilePage = () => {
       await updateTripStatus(tripToCancel, 201); // Status 201 for "Cancelled"
       const tripIds = await getCustomerTripIds(uid);
       const tripDetails = await Promise.all(tripIds.map(getTripDetails));
+      // Sort trips by bookedTime in descending order
+      tripDetails.sort(
+        (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
+      );
 
       setTrips(tripDetails);
       closeConfirmDialog();
@@ -130,9 +138,13 @@ const ProfilePage = () => {
       if (user) {
         setUid(user.uid);
         try {
+          setProgress(10);
+          setProgressMessage("Fetching customer details...");
           const customerDetails = await getCustomerDetails(user.uid);
           setCustomer(customerDetails);
 
+          setProgress(50);
+          setProgressMessage("Fetching trip details...");
           const tripIds = await getCustomerTripIds(user.uid);
           const tripDetails = await Promise.all(tripIds.map(getTripDetails));
           tripDetails.sort(
@@ -140,11 +152,18 @@ const ProfilePage = () => {
           );
 
           setTrips(tripDetails);
+          setProgress(100);
+          setProgressMessage("Load complete.");
         } catch (error) {
+          console.log(error);
           setError("There was an error fetching the data. Please try again.");
         } finally {
           setLoading(false);
         }
+      } else {
+        toast.error("Please Login Fisrt!!");
+        setError("Please Login First");
+        setLoading(false);
       }
     });
 
@@ -163,14 +182,30 @@ const ProfilePage = () => {
     setTripToCancel(null);
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-100 to-gray-200">
-        <p className="text-lg font-semibold text-gray-600 animate-pulse">
-          Loading...
-        </p>
+      <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
+        <div className="w-full max-w-md">
+          <p className="text-lg font-semibold text-gray-600 mb-4">
+            {progressMessage}
+          </p>
+          <div className="relative pt-1">
+            <div className="flex mb-2 items-center justify-between">
+              <span className="text-xs font-semibold inline-block py-1 px-2 rounded-full text-teal-600 bg-teal-200">
+                {progress}%
+              </span>
+            </div>
+            <div className="flex-auto border-2 rounded-xl bg-gray-200">
+              <div
+                className="progress-bar h-2 rounded-xl bg-teal-500"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
+  }
 
   if (error)
     return (
