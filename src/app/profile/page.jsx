@@ -135,6 +135,9 @@ const ProfilePage = () => {
 
           const tripIds = await getCustomerTripIds(user.uid);
           const tripDetails = await Promise.all(tripIds.map(getTripDetails));
+          tripDetails.sort(
+            (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
+          );
 
           setTrips(tripDetails);
         } catch (error) {
