@@ -42,12 +42,17 @@ export default function Navbar() {
             Apps
           </Link>
           {user ? (
-            <button
-              onClick={handleSignOut}
-              className="mr-5 hover:text-customPink"
-            >
-              Sign Out
-            </button>
+            <>
+              <Link href="/profile" className="mr-5 hover:text-customPink">
+                Profile
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="mr-5 hover:text-customPink"
+              >
+                Sign Out
+              </button>
+            </>
           ) : (
             <Link href="/login" className="mr-5 hover:text-customPink">
               Login

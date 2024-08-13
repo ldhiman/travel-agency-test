@@ -65,7 +65,7 @@ const ConfirmCab = () => {
     const updatedCabData = {
       ...cabData,
       uid: uid,
-      status: "booked",
+      status: 101,
       bookedTime: new Date().getTime(),
     };
 
@@ -84,7 +84,7 @@ const ConfirmCab = () => {
           .then(() => {
             console.log("Trip ID saved under customer trips.");
             toast.success("Trip confirmed successfully!");
-            router.push("/history");
+            router.push("/profile");
           })
           .catch((error) => {
             console.error("Failed to save trip ID under customer trips", error);

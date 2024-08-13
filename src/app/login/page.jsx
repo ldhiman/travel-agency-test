@@ -11,7 +11,7 @@ import {
   PhoneAuthProvider,
   signInWithCredential,
 } from "../firebase";
-import { ref, set } from "firebase/database";
+import { ref, set, update } from "firebase/database";
 
 export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -95,9 +95,9 @@ export default function LoginPage() {
       const userCredential = await signInWithCredential(auth, credential);
       const user = userCredential.user;
 
-      await set(ref(db, "user/" + user.uid), {
+      await update(ref(db, "user/" + user.uid), {
         type: "customer",
-        customer: true
+        customer: true,
       });
       toast.success("User logged in successfully.");
       router.push("/register");
