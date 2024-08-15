@@ -9,13 +9,27 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        customLightGreen: "#e2e5e2",
-        customMintGreen: "#ddf8ec",
-        customLightBlue: "#bad7f2",
-        customPink: "#dd5a7d",
+        "custom-light": "#FFFAFF",
+        "custom-pink": "#E8577B",
+        "custom-dark": "#1E1B18",
       },
       fontFamily: {
-        ubuntu: ["Ubuntu", "sans-serif"],
+        "barlow-condensed": ["Barlow Condensed", "sans-serif"],
+      },
+      fontWeight: {
+        thin: 100,
+        extralight: 200,
+        light: 300,
+        regular: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700,
+        extrabold: 800,
+        black: 900,
+      },
+      fontStyle: {
+        italic: "italic",
+        normal: "normal",
       },
     },
   },

@@ -307,9 +307,9 @@ const TripPlanner = () => {
             <button
               key={type}
               onClick={() => setTripType(type)}
-              className={`mx-2 my-2 py-2 px-4 rounded-full text-white font-small focus:outline-none shadow-md ${
+              className={`mx-1 my-1 py-1 px-4 rounded-xl font-barlow-condensed font-bold  text-sm text-white font-small focus:outline-none shadow-md ${
                 tripType === type
-                  ? "bg-indigo-700"
+                  ? "bg-indigo-600"
                   : "bg-indigo-400 hover:bg-indigo-500"
               }`}
             >
@@ -318,9 +318,9 @@ const TripPlanner = () => {
           ))}
         </div>
 
-        <div className="mb-6">
-          <div className="relative mb-4 w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-2">
+          <div className="relative mb-2 w-full">
+            <label className="block text-sm font-bold font-barlow-condensed text-custom-dark mb-1">
               SOURCE
             </label>
             <div className="flex items-center w-full">
@@ -342,7 +342,7 @@ const TripPlanner = () => {
                 options={getAutocompleteOptions()}
               >
                 <TextField
-                  className="w-full"
+                  className="w-full "
                   placeholder="Search for source"
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
@@ -358,14 +358,14 @@ const TripPlanner = () => {
               )}
             </div>
             {sourceLocationName && (
-              <div className="mt-2 text-sm text-gray-500">
+              <div className="mt-2 text-sm bg-custom-dark">
                 {sourceLocationName}
               </div>
             )}
           </div>
 
           <div className="relative mb-4 w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-bold font-barlow-condensed text-custom-dark mb-1">
               DESTINATION
             </label>
             <div className="flex items-center w-full">
@@ -417,7 +417,7 @@ const TripPlanner = () => {
 
           <TimePickerField
             id="pickup-time-field"
-            label="PICK UP TIME"
+            label="PICK UP TIME "
             onChange={handlePickupTimeChange}
             disabled={!pickupDatetime} // Disable until date is selected
           />
@@ -442,7 +442,7 @@ const TripPlanner = () => {
 
           <button
             onClick={handleExploreCabs}
-            className="mt-6 py-2 px-4 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none"
+            className="mt-2 py-2 px-2 font-barlow-condensed font-bold w-1/2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none"
           >
             EXPLORE CABS
           </button>
