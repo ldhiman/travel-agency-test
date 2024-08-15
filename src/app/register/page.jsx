@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ref, set } from "firebase/database";
+import { ref, update } from "firebase/database";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { TextField } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -93,7 +93,7 @@ export default function RegisterPage() {
       }
 
       const userRef = ref(db, `customers/${uid}`);
-      await set(userRef, {
+      await update(userRef, {
         name: formData.name,
         email: formData.email,
         dob: formData.dob,
@@ -101,7 +101,7 @@ export default function RegisterPage() {
       });
 
       const typeRef = ref(db, `user/${uid}`);
-      await set(typeRef, {
+      await update(typeRef, {
         customer: true,
       });
       toast.success("Data Saved!!");
