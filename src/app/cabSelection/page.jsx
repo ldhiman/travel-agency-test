@@ -30,38 +30,80 @@ const CabSelection = () => {
     fetchTripData();
   }, [searchParams]);
 
-  // Get vehicle types from the keys of fares
-  const getVehicleTypes = () => {
-    const vehicleTypes = [];
-    const fares = fullTripData?.distanceData?.fares || [];
-    for (let i = 0; i < fares.length; i++) {
-      vehicleTypes.push(Object.keys(fares[i])[0]);
-    }
-
-    return vehicleTypes;
-  };
-
-  const vehicleTypes = getVehicleTypes();
-
   const calculateTotalFare = (type) => {
-    const fareTypes = fullTripData?.distanceData?.fareTypes || [];
+    const fares = fullTripData?.distanceData?.fares || {};
+    const gst = fullTripData?.distanceData?.gst || 0;
     let totalFare = 0;
     let fareInfo = "";
 
-    for (const fareType of fareTypes) {
-      const fareArray = fullTripData?.distanceData[fareType] || [];
-      const fareEntry = fareArray.find(
-        (entry) => Object.keys(entry)[0] === type
-      );
+    if (fares[type]) {
+      const {
+        baseFare = 0,
+        stateTax = 0,
+        allowance = 0,
+        tollTax = 0,
+        extraDistance,
+        nightDrop,
+      } = fares[type];
 
-      if (fareEntry) {
-        const value = Object.values(fareEntry)[0];
-        totalFare += parseFloat(value) || 0;
-        fareInfo += `${fareType}: ${value}\n`;
+      // Ensure all values are numbers
+      const baseFareNum = parseFloat(baseFare) || 0;
+      const stateTaxNum = parseFloat(stateTax) || 0;
+      const tollTaxNum = parseFloat(tollTax) || 0;
+      const allowanceNum = parseFloat(allowance) || 0;
+      const nightDropNum = parseFloat(nightDrop) || 0; // Ensure nightDrop is a number
+
+      // Calculate the total fare based on trip type
+      switch (fullTripData?.tripType) {
+        case "ONE WAY":
+        case "ROUND TRIP":
+          totalFare = baseFareNum + stateTaxNum + allowanceNum + tollTaxNum;
+          fareInfo += `\nToll Tax: Rs.${tollTaxNum}`;
+          fareInfo += `\nState Tax: Rs.${stateTaxNum}`;
+          break;
+
+        case "HOURLY RENTAL":
+          totalFare = baseFareNum + allowanceNum; // Additional charges like extraDistance and nightDrop can be factored in based on usage
+          if (extraDistance)
+            fareInfo += `\nExtra Distance: Rs.${extraDistance} per Km`;
+          if (nightDrop) fareInfo += `\nNight Drop: Rs.${nightDrop}`;
+          break;
+
+        default:
+          break;
       }
+
+      // Apply GST
+      totalFare += totalFare * gst;
+      fareInfo += `\nBase Fare: Rs.${baseFareNum} \nAllowance: Rs.${allowanceNum}\nGST: ${
+        gst * 100
+      }%`;
+
+      // Add distance and duration if they are non-zero
+      if (
+        fullTripData.distanceData?.distance &&
+        fullTripData.distanceData.distance > 0
+      ) {
+        fareInfo += `\nDistance: ${fullTripData.distanceData.distance}`;
+      }
+      if (
+        fullTripData.distanceData?.duration &&
+        fullTripData.distanceData.duration > 0
+      ) {
+        fareInfo += `\nDuration: ${fullTripData.distanceData.duration}`;
+      }
+
+      // Add night drop charges if pickup time is at night
+      if (shouldIncludeNightDrop(fullTripData.pickupDatetime, nightDropNum)) {
+        totalFare += nightDropNum;
+        fareInfo += `\nNight Drop Charge: Rs.${nightDropNum}`;
+      }
+
+      fareInfo += "\n\nNote: " + fullTripData.distanceData.info;
     }
 
-    return [totalFare.toLocaleString(), fareInfo.trim()];
+    // Ensure totalFare is a number before calling toFixed
+    return [totalFare.toFixed(2), fareInfo.trim()];
   };
 
   const formattedDuration = convertMinutesToHoursAndMinutes(
@@ -70,29 +112,25 @@ const CabSelection = () => {
       : 0
   );
 
-  const handleCabSelection = (
-    vehicleTag,
-    vehicleType,
-    totalCost,
-    duration,
-    passengers,
-    luggage
-  ) => {
+  const handleCabSelection = (vehicleType, totalCost) => {
     const cabData = {
-      ...fullTripData,
-      vehicleTag,
       vehicleType,
       totalCost,
-      duration,
-      passengers,
-      luggage,
     };
 
     console.log("Cab Data:", cabData);
 
+    const parsingData = {
+      ...fullTripData,
+      fare: fullTripData.distanceData.fares[vehicleType],
+      cabData,
+    };
+
     router.push(
       "/confirmCab?" +
-        new URLSearchParams({ data: btoa(JSON.stringify(cabData)) }).toString()
+        new URLSearchParams({
+          data: btoa(JSON.stringify(parsingData)),
+        }).toString()
     );
   };
 
@@ -126,35 +164,26 @@ const CabSelection = () => {
             </p>
           </div>
           <section className="text-gray-600 body-font flex flex-col overflow-hidden">
-            {vehicleTypes.map((type) => {
-              const [fare, fareInfo] = calculateTotalFare(type);
+            {["ONE WAY", "ROUND TRIP", "HOURLY RENTAL"].includes(tripType) &&
+              Object.keys(fullTripData.distanceData?.fares || {}).map(
+                (vehicleType, index) => {
+                  const fareDetails = calculateTotalFare(vehicleType);
 
-              return (
-                <VehicleCard
-                  key={type}
-                  type={type}
-                  total={fare}
-                  info={fareInfo}
-                  passengers={passengers}
-                  luggage={luggage}
-                  distance={fullTripData.distanceData?.distance}
-                  duration={formattedDuration}
-                  hourly={
-                    fullTripData.tripType == "HOURLY RENTAL" ? true : false
-                  }
-                  onClick={() =>
-                    handleCabSelection(
-                      "Economy", // Example value, should be dynamically determined if needed
-                      type,
-                      fare,
-                      formattedDuration,
-                      passengers,
-                      luggage
-                    )
-                  }
-                />
-              );
-            })}
+                  return (
+                    <VehicleCard
+                      key={index}
+                      type={vehicleType}
+                      total={fareDetails[0]}
+                      info={fareDetails[1]}
+                      distance={fullTripData.distanceData?.distance}
+                      duration={formattedDuration}
+                      onClick={() =>
+                        handleCabSelection(vehicleType, fareDetails[0])
+                      }
+                    />
+                  );
+                }
+              )}
           </section>
         </>
       ) : (
@@ -162,6 +191,16 @@ const CabSelection = () => {
       )}
     </div>
   );
+};
+
+// Helper function to check if pickup time is during night
+const shouldIncludeNightDrop = (pickupDatetime, nightDropCharge) => {
+  if (!pickupDatetime || !nightDropCharge) return false;
+
+  const pickupTime = new Date(pickupDatetime).getHours();
+  const nightStart = 20; // 8 PM as the start of the night period
+
+  return pickupTime >= nightStart;
 };
 
 const convertMinutesToHoursAndMinutes = (minutes) => {

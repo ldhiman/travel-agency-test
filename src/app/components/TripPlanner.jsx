@@ -318,16 +318,18 @@ const TripPlanner = () => {
               <Autocomplete
                 onLoad={(autocomplete) => setSourceAutocomplete(autocomplete)}
                 onPlaceChanged={() => {
-                  const place = sourceAutocomplete.getPlace();
-                  if (place.geometry) {
-                    setSource(place.formatted_address);
-                    setSourceCoords({
-                      lat: place.geometry.location.lat(),
-                      lng: place.geometry.location.lng(),
-                    });
-                    setSourceLocationName(
-                      place.name || place.formatted_address
-                    );
+                  if (sourceAutocomplete) {
+                    const place = sourceAutocomplete.getPlace();
+                    if (place.geometry) {
+                      setSource(place.formatted_address);
+                      setSourceCoords({
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                      });
+                      setSourceLocationName(
+                        place.name || place.formatted_address
+                      );
+                    }
                   }
                 }}
               >
@@ -364,16 +366,18 @@ const TripPlanner = () => {
                     setDestinationAutocomplete(autocomplete)
                   }
                   onPlaceChanged={() => {
-                    const place = destinationAutocomplete.getPlace();
-                    if (place.geometry) {
-                      setDestination(place.formatted_address);
-                      setDestinationCoords({
-                        lat: place.geometry.location.lat(),
-                        lng: place.geometry.location.lng(),
-                      });
-                      setDestinationLocationName(
-                        place.name || place.formatted_address
-                      );
+                    if (destinationAutocomplete) {
+                      const place = destinationAutocomplete.getPlace();
+                      if (place.geometry) {
+                        setDestination(place.formatted_address);
+                        setDestinationCoords({
+                          lat: place.geometry.location.lat(),
+                          lng: place.geometry.location.lng(),
+                        });
+                        setDestinationLocationName(
+                          place.name || place.formatted_address
+                        );
+                      }
                     }
                   }}
                 >

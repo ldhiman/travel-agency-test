@@ -1,107 +1,46 @@
 import Image from "next/image";
 
-const VehicleCard = ({
-  type,
-  total,
-  info,
-  distance,
-  duration,
-  hourly,
-  onClick,
-}) => {
-  // Function to parse the fare information
-  const parseInfo = (info) => {
-    const infoLines = info.split("\n");
-    const parsedInfo = {};
-
-    for (let i = 0; i < infoLines.length; i++) {
-      if (infoLines[i].split(":")[0] == "extraDistance") {
-        parsedInfo[infoLines[i].split(":")[0]] =
-          infoLines[i].split(":")[1] + " per Km after time ends";
-      } else {
-        parsedInfo[infoLines[i].split(":")[0]] = infoLines[i].split(":")[1];
-      }
-    }
-
-    return parsedInfo;
-  };
-
-  const parsedInfo = parseInfo(info);
-
+const VehicleCard = ({ type, total, info, distance, duration, onClick }) => {
   return (
-    <div
-      className="flex flex-col lg:flex-row bg-white shadow-lg rounded-lg overflow-hidden mb-6 cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="relative w-full lg:w-1/3">
+    <div className="p-6 w-full bg-white shadow-lg rounded-xl flex flex-col md:flex-row mb-6 transition-transform transform hover:shadow-xl">
+      {/* Car image on the left side, hidden on medium screens and below */}
+      <div className="w-full md:w-1/2 flex-shrink-0 h-full overflow-hidden rounded-xl md:block hidden">
         <Image
+          src="/cars.jpg"
           alt={`${type} vehicle`}
-          src={`/cars.jpg`} // Assuming images are named by vehicle type
-          layout="fill"
-          objectFit="cover"
-          className="absolute inset-0 w-full h-full"
+          layout="responsive"
+          width={400}
+          height={250}
+          className="object-cover rounded-xl"
         />
       </div>
-      <div className="p-6 flex flex-col justify-between w-full lg:w-2/3">
-        <div>
-          <button className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm mb-2">
-            {type === "TempoTraveller" ? "Value" : "Economy"}
-          </button>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            {type.toUpperCase()}
-          </h2>
-          <p className="text-xl font-medium text-gray-800 mb-2">₹ {total}</p>
-
-          {/* Fare breakdown */}
-          <div className="text-gray-600 mb-4">
-            <div className="flex flex-col">
-              {parsedInfo.fares && (
-                <p className="text-gray-700 mb-1">
-                  <strong>Base Fare:</strong> ₹ {parsedInfo.fares}
-                </p>
-              )}
-              {parsedInfo.extraDistance && (
-                <p className="text-gray-700 mb-1">
-                  <strong>Extra Distance:</strong> ₹ {parsedInfo.extraDistance}
-                </p>
-              )}
-              {parsedInfo.nightDrop && (
-                <p className="text-gray-700 mb-1">
-                  <strong>Night Drop:</strong> ₹ {parsedInfo.nightDrop}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {!hourly && (
-            <div className="flex flex-col mb-4">
-              <p className="text-gray-700">
-                <strong>Distance:</strong> {distance || "N/A"}
-              </p>
-              <p className="text-gray-700">
-                <strong>Duration:</strong> {duration}
-              </p>
-            </div>
-          )}
+      {/* Vehicle details on the right side */}
+      <div className="w-full md:w-1/2 pl-0 md:pl-6 flex flex-col">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl font-bold text-gray-800">
+            {type != "traveller12_14"
+              ? type != "traveller16"
+                ? type.substring(0, 1).toUpperCase() + type.substring(1)
+                : "Traveller 16 Seater"
+              : "Traveller 12-14 Seater"}
+          </h3>
+          <p className="text-3xl font-semibold text-indigo-600">₹{total}</p>
         </div>
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, index) => (
-              <svg
-                key={index}
-                fill={index < 4 ? "currentColor" : "none"}
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                className="w-5 h-5 text-yellow-500"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-            ))}
+        <div className="flex-1 flex flex-col">
+          <div className="flex-grow text-sm text-gray-600">
+            <p className="whitespace-pre-line bg-gray-50 p-3 text-lg rounded-lg h-full">
+              <strong className="font-medium text-gray-700">
+                Fare Breakdown:
+              </strong>
+              {"\n" + info}
+            </p>
           </div>
-          <p className="text-gray-600 text-sm">Moderate comfort, Best price</p>
+          <button
+            className="mt-4 bg-indigo-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-600 transition-colors"
+            onClick={onClick}
+          >
+            Select
+          </button>
         </div>
       </div>
     </div>

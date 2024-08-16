@@ -123,9 +123,11 @@ const ConfirmCab = () => {
               <p>
                 <strong>Source:</strong> {cabData.source}
               </p>
-              <p>
-                <strong>Destination:</strong> {cabData.destination}
-              </p>
+              {cabData.destination && (
+                <p>
+                  <strong>Destination:</strong> {cabData.destination}
+                </p>
+              )}
               <p>
                 <strong>Pickup Date and Time:</strong>{" "}
                 {cabData.pickupDatetime
@@ -140,23 +142,37 @@ const ConfirmCab = () => {
               ) : (
                 <></>
               )}
-              <p>
-                <strong>Duration:</strong> {cabData.duration}
-              </p>
+              {cabData.hours && (
+                <p>
+                  <strong>Hours:</strong> {cabData.hours} hr
+                </p>
+              )}
+              {cabData.distance && (
+                <p>
+                  <strong>Distance:</strong> {cabData.distance}
+                </p>
+              )}
+              {cabData.duration && (
+                <p>
+                  <strong>Duration:</strong> {cabData.duration}
+                </p>
+              )}
             </div>
             <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-700 mb-2">
                 Cab Details
               </h2>
               <p>
-                <strong>Vehicle Tag:</strong> {cabData.vehicleTag}
+                <strong>Vehicle Type:</strong> {cabData.cabData.vehicleType}
               </p>
               <p>
-                <strong>Vehicle Type:</strong> {cabData.vehicleType}
+                <strong>Total Cost:</strong> ₹ {cabData.cabData.totalCost}
               </p>
-              <p>
-                <strong>Total Cost:</strong> ₹ {cabData.totalCost}
-              </p>
+              {cabData.distanceData.info && (
+                <p>
+                  <strong>Note:</strong> {cabData.distanceData.info}
+                </p>
+              )}
             </div>
             <div className="mt-6 flex justify-center">
               <button
