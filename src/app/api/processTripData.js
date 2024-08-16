@@ -4,8 +4,10 @@ module.exports.processTripData = async (data) => {
   try {
     // Fetch distance
     const distanceData = await fetchDistanceAndFare(
+      data.tripType,
       data.sourceCoords,
-      data.destinationCoords
+      data.destinationCoords,
+      data.hours
     );
 
     if (distanceData) {

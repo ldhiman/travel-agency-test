@@ -3,13 +3,20 @@ const axios = require("axios");
 // Base URL of the API
 const apiUrl = "https://calculatedistanceandfare-no72p4gkhq-uc.a.run.app";
 
-const fetchDistanceAndFare = async (sourceCoords, destinationCoords) => {
+const fetchDistanceAndFare = async (
+  tripType,
+  sourceCoords,
+  destinationCoords,
+  hours
+) => {
   try {
     const response = await axios.post(
       `${apiUrl}`, // Apply proxy if in development
       {
+        tripType,
         sourceCoords,
         destinationCoords,
+        hours,
       },
       {
         headers: {

@@ -191,7 +191,7 @@ const TripPlanner = () => {
         destinationCoords,
       }),
       ...(tripType === "HOURLY RENTAL" && {
-        hourlyRentalHours,
+        hours: hourlyRentalHours,
       }),
       ...(tripType === "ROUND TRIP" && {
         returnDatetime: returnDatetime?.getTime(),

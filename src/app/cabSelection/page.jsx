@@ -3,14 +3,11 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import VehicleCard from "../components/vehicleCard";
-// import styles from "./style.module.css";
 
 const CabSelection = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [fullTripData, setFullTripData] = useState(null);
-  const [vehicleTag, setVehicleTag] = useState("");
-  const [vehicleType, setVehicleType] = useState("");
   const [passengers, setPassengers] = useState("");
   const [luggage, setLuggage] = useState("");
 
@@ -33,21 +30,39 @@ const CabSelection = () => {
     fetchTripData();
   }, [searchParams]);
 
-  const calculateTotalFare = (type) => {
-    const fares = fullTripData?.distanceData?.fares || {};
-    const tollCosts = fullTripData?.distanceData?.tollCosts || {};
-    const fare = fares[type] || 0;
-    const tollCost = tollCosts[type] || 0;
-    const totalCost = fare + tollCost;
-    return totalCost.toLocaleString();
+  // Get vehicle types from the keys of fares
+  const getVehicleTypes = () => {
+    const vehicleTypes = [];
+    const fares = fullTripData?.distanceData?.fares || [];
+    for (let i = 0; i < fares.length; i++) {
+      vehicleTypes.push(Object.keys(fares[i])[0]);
+    }
+
+    return vehicleTypes;
   };
 
-  const vehicleTypes = [
-    { type: "Compact", passengers: 4, luggage: 1 },
-    { type: "Sedan", passengers: 4, luggage: 1 },
-    { type: "SUV", passengers: 6, luggage: 3 },
-    { type: "TempoTraveller", passengers: 12, luggage: 10 },
-  ];
+  const vehicleTypes = getVehicleTypes();
+
+  const calculateTotalFare = (type) => {
+    const fareTypes = fullTripData?.distanceData?.fareTypes || [];
+    let totalFare = 0;
+    let fareInfo = "";
+
+    for (const fareType of fareTypes) {
+      const fareArray = fullTripData?.distanceData[fareType] || [];
+      const fareEntry = fareArray.find(
+        (entry) => Object.keys(entry)[0] === type
+      );
+
+      if (fareEntry) {
+        const value = Object.values(fareEntry)[0];
+        totalFare += parseFloat(value) || 0;
+        fareInfo += `${fareType}: ${value}\n`;
+      }
+    }
+
+    return [totalFare.toLocaleString(), fareInfo.trim()];
+  };
 
   const formattedDuration = convertMinutesToHoursAndMinutes(
     fullTripData?.distanceData?.duration
@@ -81,6 +96,8 @@ const CabSelection = () => {
     );
   };
 
+  const tripType = fullTripData?.tripType || "ONE WAY";
+
   return (
     <div className="container mx-auto px-4 py-6">
       {fullTripData ? (
@@ -90,13 +107,10 @@ const CabSelection = () => {
               Trip Details
             </h2>
             <p className="text-gray-700">
-              <strong>Trip Type:</strong> {fullTripData.tripType}
+              <strong>Trip Type:</strong> {tripType}
             </p>
             <p className="text-gray-700">
               <strong>Source:</strong> {fullTripData.source}
-            </p>
-            <p className="text-gray-700">
-              <strong>Destination:</strong> {fullTripData.destination}
             </p>
             <p className="text-gray-700">
               <strong>Pickup Date and Time:</strong>{" "}
@@ -105,39 +119,42 @@ const CabSelection = () => {
                 : "N/A"}
             </p>
             <p className="text-gray-700">
-              <strong>Return Date and Time:</strong>{" "}
-              {fullTripData.returnDatetime
-                ? new Date(fullTripData.returnDatetime).toString()
-                : "N/A"}
+              <strong>Distance:</strong> {fullTripData.distanceData?.distance}
             </p>
             <p className="text-gray-700">
               <strong>Duration:</strong> {formattedDuration}
             </p>
           </div>
           <section className="text-gray-600 body-font flex flex-col overflow-hidden">
-            {vehicleTypes.map(({ type, passengers, luggage }) => (
-              <VehicleCard
-                key={type}
-                type={type}
-                total={calculateTotalFare(type)}
-                baseFare={fullTripData.distanceData.fares[type]}
-                tollTax={fullTripData.distanceData.tollCosts[type]}
-                passengers={passengers}
-                luggage={luggage}
-                distance={fullTripData.distanceData?.distance}
-                duration={formattedDuration}
-                onClick={() =>
-                  handleCabSelection(
-                    "Economy", // Example value, should be dynamically determined if needed
-                    type,
-                    calculateTotalFare(type),
-                    formattedDuration,
-                    passengers,
-                    luggage
-                  )
-                }
-              />
-            ))}
+            {vehicleTypes.map((type) => {
+              const [fare, fareInfo] = calculateTotalFare(type);
+
+              return (
+                <VehicleCard
+                  key={type}
+                  type={type}
+                  total={fare}
+                  info={fareInfo}
+                  passengers={passengers}
+                  luggage={luggage}
+                  distance={fullTripData.distanceData?.distance}
+                  duration={formattedDuration}
+                  hourly={
+                    fullTripData.tripType == "HOURLY RENTAL" ? true : false
+                  }
+                  onClick={() =>
+                    handleCabSelection(
+                      "Economy", // Example value, should be dynamically determined if needed
+                      type,
+                      fare,
+                      formattedDuration,
+                      passengers,
+                      luggage
+                    )
+                  }
+                />
+              );
+            })}
           </section>
         </>
       ) : (
