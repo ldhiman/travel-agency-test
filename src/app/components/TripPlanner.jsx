@@ -5,7 +5,7 @@ import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import TextField from "@mui/material/TextField";
 import { processTripData } from "../api/processTripData";
 import {
-  useLoadScript,
+  useJsApiLoader,
   Autocomplete,
   Marker,
   GoogleMap,
@@ -49,12 +49,13 @@ const TripPlanner = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState("");
+  const [hourlyRentalHours, setHourlyRentalHours] = useState(""); // State for hourly rental hours
 
   const [loading, setLoading] = useState(false); // Add state for loading
 
   const router = useRouter();
 
-  const { isLoaded } = useLoadScript({
+  const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
     libraries,
   });
@@ -111,15 +112,43 @@ const TripPlanner = () => {
     setMapOpen(true);
   };
 
+  const handleHourlyRentalHoursChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+
+    if (isNaN(value)) {
+      setHourlyRentalHours("");
+      setError("Please enter a valid number.");
+      return;
+    }
+
+    if (value < 1) {
+      setHourlyRentalHours(1);
+      setError("Minimum is 1 hour.");
+    } else if (value > 8) {
+      setHourlyRentalHours(8);
+      setError("Maximum is 8 hours.");
+    } else {
+      setHourlyRentalHours(value);
+      setError("");
+    }
+  };
+
   const handleExploreCabs = async () => {
     if (!sourceCoords) {
       setError("Source location is required.");
       return;
     }
 
-    if (!destinationCoords) {
-      setError("Destination location is required.");
-      return;
+    if (tripType !== "HOURLY RENTAL") {
+      if (!destinationCoords) {
+        setError("Destination location is required.");
+        return;
+      }
+    } else {
+      if (!hourlyRentalHours) {
+        setError("Hours is required.");
+        return;
+      }
     }
 
     if (!pickupDatetime) {
@@ -155,10 +184,15 @@ const TripPlanner = () => {
     const tripData = {
       tripType,
       source,
-      destination,
       pickupDatetime: pickupDatetime?.getTime(),
       sourceCoords,
-      destinationCoords,
+      ...(tripType !== "HOURLY RENTAL" && {
+        destination,
+        destinationCoords,
+      }),
+      ...(tripType === "HOURLY RENTAL" && {
+        hourlyRentalHours,
+      }),
       ...(tripType === "ROUND TRIP" && {
         returnDatetime: returnDatetime?.getTime(),
       }),
@@ -258,331 +292,341 @@ const TripPlanner = () => {
 
             // Update user location
             setUserLocation(newLocation);
-
-            // Add or update marker
-            if (currentLocationMarker) {
-              currentLocationMarker.setPosition(newLocation);
-            } else {
-              const marker = new window.google.maps.Marker({
-                position: newLocation,
-                map: mapRef,
-                title: "Your Location",
-                icon: "http://maps.google.com/mapfiles/ms/icons/POI.png", // Optional: custom icon
-              });
-              setCurrentLocationMarker(marker);
-            }
           },
           (error) => {
-            if (error.code === error.PERMISSION_DENIED) {
-              alert("Location access denied. Please enable location services.");
-            } else {
-              console.error("Error getting user location:", error.message);
-            }
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
+            console.error("Error getting user location:", error);
           }
         );
-      } else {
-        alert("Geolocation is not supported by your browser.");
       }
     }
   };
 
-  if (!isLoaded) return <div className="text-center p-4">Loading...</div>;
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div className="p-6">
-        {error && (
-          <div className="bg-red-500 text-white p-3 rounded mb-6 text-center">
-            {error}
-          </div>
-        )}
+    <div className="max-w-5xl mx-auto mt-8">
+      <h1 className="text-4xl font-bold text-center mb-8">Plan Your Trip</h1>
 
-        <div className="flex mb-6">
-          {["ONE WAY", "ROUND TRIP", "LOCAL", "AIRPORT"].map((type) => (
-            <button
-              key={type}
-              onClick={() => setTripType(type)}
-              className={`mx-1 my-1 py-1 px-4 rounded-xl font-barlow-condensed font-bold  text-sm text-white font-small focus:outline-none shadow-md ${
-                tripType === type
-                  ? "bg-indigo-600"
-                  : "bg-indigo-400 hover:bg-indigo-500"
-              }`}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
-
-        <div className="mb-2">
-          <div className="relative mb-2 w-full">
-            <label className="block text-sm font-bold font-barlow-condensed text-custom-dark mb-1">
-              SOURCE
-            </label>
-            <div className="flex items-center w-full">
+      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          {/* Source Input */}
+          <div>
+            {/* <label className="block text-gray-700 text-sm font-bold mb-2">
+              Source
+            </label> */}
+            <div className="relative">
               <Autocomplete
-                onLoad={setSourceAutocomplete}
+                onLoad={(autocomplete) => setSourceAutocomplete(autocomplete)}
                 onPlaceChanged={() => {
-                  if (sourceAutocomplete) {
-                    const place = sourceAutocomplete.getPlace();
-                    if (place && place.geometry) {
-                      setSource(place.formatted_address || "");
-                      setSourceCoords({
-                        lat: place.geometry.location.lat(),
-                        lng: place.geometry.location.lng(),
-                      });
-                      setSourceLocationName(place.formatted_address || "");
-                    }
+                  const place = sourceAutocomplete.getPlace();
+                  if (place.geometry) {
+                    setSource(place.formatted_address);
+                    setSourceCoords({
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng(),
+                    });
+                    setSourceLocationName(
+                      place.name || place.formatted_address
+                    );
                   }
                 }}
-                options={getAutocompleteOptions()}
               >
                 <TextField
-                  className="w-full "
-                  placeholder="Search for source"
+                  label="Pickup"
+                  variant="outlined"
+                  fullWidth
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButton
+                        aria-label="select source from map"
+                        onClick={() => openMapModal("source")}
+                      >
+                        <LocationOnIcon />
+                      </IconButton>
+                    ),
+                  }}
                 />
               </Autocomplete>
-              {tripType !== "AIRPORT" && (
-                <IconButton
-                  onClick={() => openMapModal("source")}
-                  color="primary"
-                >
-                  <LocationOnIcon />
-                </IconButton>
-              )}
             </div>
-            {sourceLocationName && (
-              <div className="mt-2 text-sm bg-custom-dark">
-                {sourceLocationName}
-              </div>
-            )}
           </div>
 
-          <div className="relative mb-4 w-full">
-            <label className="block text-sm font-bold font-barlow-condensed text-custom-dark mb-1">
-              DESTINATION
-            </label>
-            <div className="flex items-center w-full">
-              <Autocomplete
-                onLoad={setDestinationAutocomplete}
-                onPlaceChanged={() => {
-                  if (destinationAutocomplete) {
+          {/* Destination Input */}
+          {tripType !== "HOURLY RENTAL" && (
+            <div>
+              {/* <label className="block text-gray-700 text-sm font-bold mb-2">
+                Destination
+              </label> */}
+              <div className="relative">
+                <Autocomplete
+                  onLoad={(autocomplete) =>
+                    setDestinationAutocomplete(autocomplete)
+                  }
+                  onPlaceChanged={() => {
                     const place = destinationAutocomplete.getPlace();
-                    if (place && place.geometry) {
-                      setDestination(place.formatted_address || "");
+                    if (place.geometry) {
+                      setDestination(place.formatted_address);
                       setDestinationCoords({
                         lat: place.geometry.location.lat(),
                         lng: place.geometry.location.lng(),
                       });
-                      setDestinationLocationName(place.formatted_address || "");
+                      setDestinationLocationName(
+                        place.name || place.formatted_address
+                      );
                     }
-                  }
-                }}
-                options={getAutocompleteOptions()}
-              >
-                <TextField
-                  className="w-full"
-                  placeholder="Search for destination"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                />
-              </Autocomplete>
-              <IconButton
-                onClick={() => openMapModal("destination")}
-                color="primary"
-              >
-                <LocationOnIcon />
-              </IconButton>
-            </div>
-            {destinationLocationName && (
-              <div className="mt-2 text-sm text-gray-500">
-                {destinationLocationName}
+                  }}
+                >
+                  <TextField
+                    label="Drop Location"
+                    variant="outlined"
+                    fullWidth
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButton
+                          aria-label="select destination from map"
+                          onClick={() => openMapModal("destination")}
+                        >
+                          <LocationOnIcon />
+                        </IconButton>
+                      ),
+                    }}
+                  />
+                </Autocomplete>
               </div>
-            )}
-          </div>
-
-          <DatePickerField
-            id="pickup-date-field"
-            label="PICK UP DATE"
-            value={pickupDatetime}
-            onChange={handlePickupDateChange}
-            minDate={new Date()} // Disables past dates
-          />
-
-          <TimePickerField
-            id="pickup-time-field"
-            label="PICK UP TIME "
-            onChange={handlePickupTimeChange}
-            disabled={!pickupDatetime} // Disable until date is selected
-          />
-
-          {tripType === "ROUND TRIP" && (
-            <>
-              <DatePickerField
-                id="return-date-field"
-                label="RETURN DATE"
-                value={returnDatetime}
-                onChange={handleReturnDateChange}
-                minDate={pickupDatetime ? pickupDatetime : new Date()} // Min date should be pickup date
-              />
-              <TimePickerField
-                id="return-time-field"
-                label="RETURN TIME"
-                onChange={handleReturnTimeChange}
-                disabled={!returnDatetime} // Disable until return date is selected
-              />
-            </>
+            </div>
           )}
-
-          <button
-            onClick={handleExploreCabs}
-            className="mt-2 py-2 px-2 font-barlow-condensed font-bold w-1/2 bg-indigo-600 text-white rounded-md shadow-md hover:bg-indigo-700 focus:outline-none"
-          >
-            EXPLORE CABS
-          </button>
         </div>
 
-        {loading && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div className="flex items-center justify-center space-x-4">
-              <div className="relative">
-                <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>
-                <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-gray-200 border-solid rounded-full animate-spin opacity-50"></div>
-              </div>
-              <p className="text-white text-lg font-semibold">Loading...</p>
+        {/* Trip Type Selection */}
+        <div className="mb-8">
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Trip Type
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              className={`py-2 px-4 rounded-lg font-bold ${
+                tripType === "ONE WAY"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setTripType("ONE WAY")}
+            >
+              One Way
+            </button>
+            <button
+              className={`py-2 px-4 rounded-lg font-bold ${
+                tripType === "ROUND TRIP"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setTripType("ROUND TRIP")}
+            >
+              Round Trip
+            </button>
+            <button
+              className={`py-2 px-4 rounded-lg font-bold ${
+                tripType === "HOURLY RENTAL"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+              onClick={() => setTripType("HOURLY RENTAL")}
+            >
+              Hourly Rental
+            </button>
+          </div>
+        </div>
+
+        {/* Pickup DateTime */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Pickup Date
+            </label>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                value={pickupDatetime}
+                onChange={handlePickupDateChange}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" fullWidth />
+                )}
+                disablePast
+                minDate={getMinTime()}
+              />
+            </LocalizationProvider>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Pickup Time
+            </label>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <TimePicker
+                value={pickupDatetime}
+                onChange={handlePickupTimeChange}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" fullWidth />
+                )}
+              />
+            </LocalizationProvider>
+          </div>
+        </div>
+
+        {/* Return DateTime (Conditional) */}
+        {tripType === "ROUND TRIP" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Return Date
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  value={returnDatetime}
+                  onChange={handleReturnDateChange}
+                  renderInput={(params) => (
+                    <TextField {...params} variant="outlined" fullWidth />
+                  )}
+                  disablePast
+                  minDate={pickupDatetime || getMinTime()}
+                />
+              </LocalizationProvider>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Return Time
+              </label>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <TimePicker
+                  value={returnDatetime}
+                  onChange={handleReturnTimeChange}
+                  renderInput={(params) => (
+                    <TextField {...params} variant="outlined" fullWidth />
+                  )}
+                />
+              </LocalizationProvider>
             </div>
           </div>
         )}
 
-        <Modal
-          open={mapOpen}
-          onClose={() => setMapOpen(false)}
-          aria-labelledby="map-modal-title"
-          aria-describedby="map-modal-description"
+        {/* Hourly rental (Conditional) */}
+        {tripType === "HOURLY RENTAL" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <TextField
+              label="Hours"
+              variant="outlined"
+              fullWidth
+              type="number"
+              inputProps={{
+                min: 1,
+                max: 8,
+              }}
+              value={hourlyRentalHours}
+              onChange={handleHourlyRentalHoursChange}
+              error={!!error}
+              helperText={error}
+            />
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="text-red-500 text-center font-bold mb-4">{error}</div>
+        )}
+
+        {/* Explore Cabs Button */}
+        <button
+          className="bg-blue-500 text-white py-3 px-6 rounded-lg font-bold block w-full"
+          onClick={handleExploreCabs}
+          disabled={loading} // Disable button when loading
         >
-          <div className="w-full h-full bg-white p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 id="map-modal-title" className="text-lg font-semibold">
-                Select Location on Map
-              </h2>
-              <IconButton onClick={() => setMapOpen(false)}>
-                <CloseIcon />
-              </IconButton>
-            </div>
-            <div className="w-full h-[90%]">
-              <GoogleMap
-                mapContainerStyle={{ width: "100%", height: "100%" }}
-                center={
-                  currentMapType === "source"
-                    ? sourceCoords || userLocation
-                    : destinationCoords || userLocation
-                }
-                zoom={13}
-                onClick={handleMapClick}
-                onLoad={(map) => setMapRef(map)}
-              >
-                {sourceCoords && (
-                  <Marker
-                    position={sourceCoords}
-                    icon="http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                    title="Source"
-                  />
-                )}
-                {destinationCoords && (
-                  <Marker
-                    position={destinationCoords}
-                    icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                    title="Destination"
-                  />
-                )}
-                <button
-                  onClick={handleCurrentLocationClick}
-                  className="absolute bottom-4 right-4 p-2 bg-white rounded-full shadow-md border border-gray-300"
+          {loading ? "Loading..." : "Explore Cabs"}
+        </button>
+      </div>
+
+      {/* Map Modal */}
+      <Modal open={mapOpen} onClose={() => setMapOpen(false)}>
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative">
+            <IconButton
+              onClick={() => setMapOpen(false)}
+              className="absolute top-2 right-2"
+            >
+              <CloseIcon />
+            </IconButton>
+
+            <div className="h-96 w-full">
+              {isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={userLocation}
+                  zoom={10}
+                  onClick={handleMapClick}
+                  onLoad={(map) => setMapRef(map)}
                 >
-                  <MyLocationIcon />
-                </button>
-              </GoogleMap>
+                  {userLocation && (
+                    <Marker
+                      position={userLocation}
+                      title="Your Location"
+                      icon="https://mt.google.com/vt/icon/name=icons/spotlight/directions_destination_measle_8x.png&scale=1.1"
+                    />
+                  )}
+
+                  {sourceCoords && (
+                    <Marker
+                      position={sourceCoords}
+                      title="Pickup"
+                      icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    />
+                  )}
+
+                  {destinationCoords && (
+                    <Marker
+                      position={destinationCoords}
+                      title="Drop"
+                      icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    />
+                  )}
+                </GoogleMap>
+              ) : (
+                <p>Loading map...</p>
+              )}
             </div>
           </div>
-        </Modal>
-        <Dialog
-          open={isDialogOpen}
-          onClose={() => setIsDialogOpen(false)}
-          aria-labelledby="confirm-location-dialog-title"
-          aria-describedby="confirm-location-dialog-description"
-        >
-          <DialogTitle id="confirm-location-dialog-title">
-            Confirm Location
-          </DialogTitle>
-          <DialogContent>
-            <p>Address: {selectedAddress}</p>
-            <p>Latitude: {selectedLocation?.lat}</p>
-            <p>Longitude: {selectedLocation?.lng}</p>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                setMapOpen(false);
-                setIsDialogOpen(false); // Close the dialog
-              }}
-              color="primary"
-            >
-              Confirm
-            </Button>
-            <Button onClick={() => setIsDialogOpen(false)} color="secondary">
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    </LocalizationProvider>
+        </div>
+      </Modal>
+
+      {/* Location Confirmation Dialog */}
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+        <DialogTitle>Confirm Location</DialogTitle>
+        <DialogContent>
+          <p>Address: {selectedAddress}</p>
+          <p>Coordinates: {JSON.stringify(selectedLocation)}</p>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setIsDialogOpen(false);
+              setMapOpen(false);
+            }}
+            color="primary"
+          >
+            Confirm
+          </Button>
+          <Button
+            onClick={() => {
+              setIsDialogOpen(false);
+            }}
+            color="primary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 };
-
-const DatePickerField = ({ id, label, value, onChange, minDate }) => (
-  <div className="relative mb-4 w-full">
-    <label
-      htmlFor={id}
-      className="block text-sm font-medium text-gray-700 mb-2"
-    >
-      {label}
-    </label>
-    <DatePicker
-      id={id}
-      value={value}
-      onChange={onChange}
-      minDate={minDate}
-      renderInput={(params) => <TextField {...params} fullWidth />}
-    />
-  </div>
-);
-
-const TimePickerField = ({ id, label, onChange, disabled }) => (
-  <div className="relative mb-4 w-full">
-    <label
-      htmlFor={id}
-      className="block text-sm font-medium text-gray-700 mb-2"
-    >
-      {label}
-    </label>
-    <TimePicker
-      id={id}
-      onChange={onChange}
-      disabled={disabled}
-      renderInput={(params) => <TextField {...params} fullWidth />}
-    />
-  </div>
-);
-
-const getAutocompleteOptions = () => ({
-  types: ["geocode"],
-  componentRestrictions: { country: "in" }, // Set your desired country code
-});
 
 export default TripPlanner;
