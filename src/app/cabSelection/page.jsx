@@ -113,17 +113,11 @@ const CabSelection = () => {
   );
 
   const handleCabSelection = (vehicleType, totalCost) => {
-    const cabData = {
-      vehicleType,
-      totalCost,
-    };
-
-    console.log("Cab Data:", cabData);
-
     const parsingData = {
       ...fullTripData,
       fare: fullTripData.distanceData.fares[vehicleType],
-      cabData,
+      vehicleType,
+      totalCost,
     };
 
     router.push(

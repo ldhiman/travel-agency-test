@@ -163,10 +163,10 @@ const ConfirmCab = () => {
                 Cab Details
               </h2>
               <p>
-                <strong>Vehicle Type:</strong> {cabData.cabData.vehicleType}
+                <strong>Vehicle Type:</strong> {cabData.vehicleType}
               </p>
               <p>
-                <strong>Total Cost:</strong> ₹ {cabData.cabData.totalCost}
+                <strong>Total Cost:</strong> ₹ {cabData.totalCost}
               </p>
               {cabData.distanceData.info && (
                 <p>
