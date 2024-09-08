@@ -10,6 +10,7 @@ import { faShareFromSquare } from "@fortawesome/free-regular-svg-icons";
 import { faUserCheck } from "@fortawesome/free-solid-svg-icons";
 import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
 
 
 
