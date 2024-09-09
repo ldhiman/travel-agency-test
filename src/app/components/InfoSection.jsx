@@ -9,7 +9,7 @@ export default function InfoSection() {
           <Image
             class="object-cover object-center rounded"
             alt="hero"
-            src="/cars.jpg"
+            src="/Dzire.jpg"
             width={500}
             height={500}
           />
@@ -55,7 +55,7 @@ export default function InfoSection() {
           <Image
             class="object-cover object-center rounded"
             alt="hero"
-            src="/cars.jpg"
+            src="/sedan.jpeg"
             width={500}
             height={500}
           />

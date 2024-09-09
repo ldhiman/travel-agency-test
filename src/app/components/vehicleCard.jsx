@@ -1,16 +1,31 @@
 import Image from "next/image";
 
+const vehicleImages = {
+  sedan: "/sedan.png",
+  suv: "/suv.png",
+  traveller12_14: "/traveller_1.png",
+  traveller16: "/traveller.png",
+  dzire: "/dzire.png",
+  compact: "/compact.png",
+  innova: "/innova.png",
+  innovacrysta: "/innovacrysta.png",
+};
+
 const VehicleCard = ({ type, total, info, distance, duration, onClick }) => {
+
+  // Get the image URL based on the vehicle type
+  const imageSrc = vehicleImages[type];
+
   return (
     <div className="p-6 w-full bg-white shadow-lg rounded-xl flex flex-col md:flex-row mb-6 transition-transform transform hover:shadow-xl">
       {/* Car image on the left side, hidden on medium screens and below */}
       <div className="w-full md:w-1/2 flex-shrink-0 h-full overflow-hidden rounded-xl md:block hidden">
         <Image
-          src="/cars.jpg"
+          src={imageSrc}
           alt={`${type} vehicle`}
           layout="responsive"
           width={400}
-          height={250}
+          height={400}
           className="object-cover rounded-xl"
         />
       </div>

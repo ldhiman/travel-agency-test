@@ -12,13 +12,12 @@ export default function HeroSection() {
           </h1>
           <TripPlanner />
         </div>
-        <div className="h-full w-full flex items-center justify-center lg:w-full">
+        <div className=" w-full lg:h-auto h-full object-cover object-center rounded   flex items-center justify-center lg:w-full">
           <Image
-            src="/b.png"
-            width={500}
-            height={500}
+            src="/logo.png"
+            width={400}
+            height={400}
             alt="image insert here"
-            class="lg:w-1/2 w-full lg:h-auto h-64 object-cover object-center rounded"
           />
         </div>
       </div>
