@@ -154,14 +154,14 @@ const VehicleAuthorizationForm = () => {
     );
     printWindow.document.write(printStyles); // Add the custom styles here
     printWindow.document.write("</head><body>");
-    printWindow.document.write("<div class='document-container'>");
+    printWindow.document.write(`<div class="document-container">`);
     printWindow.document.write("<h1>Vehicle Authorization</h1>");
     printWindow.document.write(documentRef.current.innerHTML);
     printWindow.document.write(
-      `<p class='document-footer'>By signing this form, you agree to the <span class="terms-link"><a href="${terms_and_condition_url}">terms and conditions</a></span> that you authorize the driver to operate your vehicle.</p>`
+      `<p class="document-footer">By signing this form, you agree to the <span class="terms-link"><a href="${terms_and_condition_url}">terms and conditions</a></span> that you authorize the driver to operate your vehicle.</p>`
     );
     printWindow.document.write(
-      `<p class='document-footer'>© ${new Date().getFullYear()} Travel India Pvt. Ltd. All rights reserved.</p>`
+      `<p class="document-footer">© ${new Date().getFullYear()} Travel India Pvt. Ltd. All rights reserved.</p>`
     );
     printWindow.document.write("</div>");
     printWindow.document.write("</body></html>");
@@ -301,7 +301,7 @@ const VehicleAuthorizationForm = () => {
               regulations.
             </p>
             <p className="mb-4">
-              Owner's Contact Information:
+              Owner&apos;s Contact Information:
               <br />
               Driving License: {formData.ownerDrivingLicense}
               <br />
