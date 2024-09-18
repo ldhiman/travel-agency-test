@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 
 import { getDatabase } from "firebase/database";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 // Firebase configuration object containing keys and identifiers
 const firebaseConfig = {
@@ -32,9 +33,22 @@ const auth = getAuth(app);
 // Get Firebase Database instance
 const db = getDatabase(app);
 
+// Get firebase storage
+const storage = getStorage(app);
+
+
+// function to get image url
+export async function getImageUrl() {
+  const imageRef = ref(storage, "noc/ThirdYearFee.pdf"); // Replace with your image path
+  const url = await getDownloadURL(imageRef);
+  return url;
+}
 export {
   auth,
   db,
+  storage,
+  ref,
+  getDownloadURL,
   RecaptchaVerifier,
   signInWithPhoneNumber,
   PhoneAuthProvider,
