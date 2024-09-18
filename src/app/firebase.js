@@ -39,7 +39,7 @@ const storage = getStorage(app);
 
 // function to get image url
 export async function getImageUrl() {
-  const imageRef = ref(storage, "noc/ThirdYearFee.pdf"); // Replace with your image path
+  const imageRef = ref(storage, "noc/VehicleAuthorization.pdf"); // Replace with your image path
   const url = await getDownloadURL(imageRef);
   return url;
 }
