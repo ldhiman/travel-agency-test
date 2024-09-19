@@ -1,11 +1,21 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 import { ref, push, set } from "firebase/database";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import toast from "react-hot-toast";
+import {
+  MapPin,
+  Calendar,
+  Clock,
+  TrendingUp,
+  Truck,
+  IndianRupee,
+  Info,
+  CarTaxiFront,
+} from "lucide-react";
 
 const ConfirmCab = () => {
   const router = useRouter();
@@ -13,10 +23,9 @@ const ConfirmCab = () => {
   const [cabData, setCabData] = useState(null);
   const [error, setError] = useState(null);
   const [uid, setUid] = useState(null);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch user UID from Firebase Auth
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUid(user.uid);
@@ -50,17 +59,15 @@ const ConfirmCab = () => {
 
   const saveTripData = () => {
     if (!cabData) {
-      toast.error("No Trip Data!!");
-      console.error("No trip data to save");
+      toast.error("No Trip Data Available!");
       return;
     }
     if (!uid) {
-      toast.error("Please Login First!!");
-      console.error("No user UID to save");
+      toast.error("Please Login to Confirm Your Trip!");
       return;
     }
 
-    setLoading(true); // Start loading spinner
+    setLoading(true);
 
     const updatedCabData = {
       ...cabData,
@@ -83,109 +90,163 @@ const ConfirmCab = () => {
         set(customerTripsRef, new Date().getTime())
           .then(() => {
             console.log("Trip ID saved under customer trips.");
-            toast.success("Trip confirmed successfully!");
+            toast.success("Your trip has been confirmed successfully!");
             router.push("/profile");
           })
           .catch((error) => {
             console.error("Failed to save trip ID under customer trips", error);
-            toast.error("Failed to save trip ID.");
+            toast.error("Failed to save trip details. Please try again.");
           })
           .finally(() => {
-            setLoading(false); // Stop loading spinner
+            setLoading(false);
           });
       })
       .catch((error) => {
         console.error("Failed to save trip data", error);
-        toast.error("Failed to save trip data.");
-        setLoading(false); // Stop loading spinner
+        toast.error("Failed to confirm trip. Please try again later.");
+        setLoading(false);
       });
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">
-          Cab Confirmation
-        </h1>
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="loader"></div>
+    <div className="bg-gray-100 min-h-screen py-12">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="bg-white shadow-2xl rounded-lg overflow-hidden">
+          <div className="bg-indigo-600 text-white py-6 px-8">
+            <h1 className="text-3xl font-bold">Confirm Your Cab Booking</h1>
           </div>
-        ) : cabData ? (
-          <>
-            <div className="space-y-4 mb-6">
-              <h2 className="text-xl font-semibold text-gray-700">
-                Trip Details
-              </h2>
-              <p>
-                <strong>Trip Type:</strong> {cabData.tripType}
-              </p>
-              <p>
-                <strong>Source:</strong> {cabData.source}
-              </p>
-              {cabData.destination && (
-                <p>
-                  <strong>Destination:</strong> {cabData.destination}
-                </p>
-              )}
-              <p>
-                <strong>Pickup Date and Time:</strong>{" "}
-                {cabData.pickupDatetime
-                  ? new Date(cabData.pickupDatetime).toLocaleString()
-                  : "N/A"}
-              </p>
-              {cabData.returnDatetime ? (
-                <p>
-                  <strong>Return Date and Time:</strong>{" "}
-                  {new Date(cabData.returnDatetime).toLocaleString()}
-                </p>
-              ) : (
-                <></>
-              )}
-              {cabData.hours && (
-                <p>
-                  <strong>Hours:</strong> {cabData.hours} hr
-                </p>
-              )}
-              {cabData.distance && (
-                <p>
-                  <strong>Distance:</strong> {cabData.distance}
-                </p>
-              )}
-              {cabData.duration && (
-                <p>
-                  <strong>Duration:</strong> {cabData.duration}
-                </p>
-              )}
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
             </div>
-            <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                Cab Details
-              </h2>
-              <p>
-                <strong>Vehicle Type:</strong> {cabData.vehicleType}
-              </p>
-              <p>
-                <strong>Total Cost:</strong> ₹ {cabData.totalCost}
-              </p>
-              {cabData.distanceData.info && (
-                <p>
-                  <strong>Note:</strong> {cabData.distanceData.info}
-                </p>
-              )}
+          ) : cabData ? (
+            <div className="p-8">
+              <div className="space-y-6 mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                  Trip Details
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center">
+                    <TrendingUp className="text-indigo-500 mr-3" size={24} />
+                    <div>
+                      <p className="text-sm text-gray-500">Trip Type</p>
+                      <p className="font-medium">{cabData.tripType}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="text-indigo-500 mr-3" size={24} />
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        Pickup Date and Time
+                      </p>
+                      <p className="font-medium">
+                        {cabData.pickupDatetime
+                          ? new Date(cabData.pickupDatetime).toLocaleString()
+                          : "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="text-indigo-500 mr-3" size={24} />
+                    <div>
+                      <p className="text-sm text-gray-500">Pickup Location</p>
+                      <p className="font-medium">{cabData.source}</p>
+                    </div>
+                  </div>
+                  {cabData.destination && (
+                    <div className="flex items-center">
+                      <MapPin className="text-indigo-500 mr-3" size={24} />
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Drop-off Location
+                        </p>
+                        <p className="font-medium">{cabData.destination}</p>
+                      </div>
+                    </div>
+                  )}
+                  {cabData.distanceData.distance && (
+                    <div className="flex items-center">
+                      <CarTaxiFront
+                        className="text-indigo-500 mr-3"
+                        size={24}
+                      />
+                      <div>
+                        <p className="text-sm text-gray-500">Distance</p>
+                        <p className="font-medium">
+                          {cabData.distanceData.distance}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {cabData.distanceData.duration && (
+                    <div className="flex items-center">
+                      <Clock className="text-indigo-500 mr-3" size={24} />
+                      <div>
+                        <p className="text-sm text-gray-500">
+                          Estimated Duration
+                        </p>
+                        <p className="font-medium">
+                          {cabData.distanceData.duration}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                  Cab and Fare Details
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center">
+                    <Truck className="text-indigo-500 mr-3" size={24} />
+                    <div>
+                      <p className="text-sm text-gray-500">Vehicle Type</p>
+                      <p className="font-medium capitalize">
+                        {cabData.vehicleType}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <IndianRupee className="text-indigo-500 mr-3" size={24} />
+                    <div>
+                      <p className="text-sm text-gray-500">Total Cost</p>
+                      <p className="font-medium text-xl">
+                        ₹ {parseFloat(cabData.totalCost).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {cabData.distanceData.info && (
+                  <div className="mt-4 flex items-start">
+                    <Info
+                      className="text-indigo-500 mr-3 flex-shrink-0"
+                      size={24}
+                    />
+                    <div>
+                      <p className="text-sm text-gray-500">Note</p>
+                      <p className="font-medium">{cabData.distanceData.info}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-center">
+                <button
+                  className="bg-indigo-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-300"
+                  onClick={saveTripData}
+                >
+                  Confirm Booking
+                </button>
+              </div>
             </div>
-            <div className="mt-6 flex justify-center">
-              <button
-                className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={saveTripData}
-              >
-                Confirm Trip
-              </button>
+          ) : (
+            <div className="p-8 text-center text-gray-600">
+              <p className="text-xl">
+                No trip data available. Please try booking again.
+              </p>
             </div>
-          </>
-        ) : (
-          <p className="text-center text-gray-600">No trip data available.</p>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

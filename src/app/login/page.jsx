@@ -148,7 +148,7 @@ export default function LoginPage() {
             {otpSent && (
               <>
                 <br />
-                <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                <label className="font-semibold text-sm text-gray-600 pb-1 block mt-5">
                   Verify OTP
                 </label>
                 <input

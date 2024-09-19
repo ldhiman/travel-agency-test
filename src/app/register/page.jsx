@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ref, update } from "firebase/database";
+import { ref, update, get } from "firebase/database";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { TextField } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -24,11 +24,28 @@ export default function RegisterPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
+        setLoading(true);
         setFormData((prevData) => ({
           ...prevData,
           contact: user.phoneNumber || "", // Update contact number from authenticated user
         }));
         setUid(user.uid);
+
+        const userRef = ref(db, `customers/${user.uid}`);
+        get(userRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            setFormData({
+              name: userData.name || "",
+              email: userData.email || "",
+              dob: userData.dob || "",
+              contact: user.phoneNumber || "",
+            });
+            setLoading(false);
+          } else {
+            setLoading(false);
+          }
+        });
       }
     });
 

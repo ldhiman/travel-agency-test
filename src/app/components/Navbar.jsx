@@ -5,14 +5,12 @@ import React, { useState, useEffect } from "react";
 import { auth } from "../firebase";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShareFromSquare } from "@fortawesome/free-regular-svg-icons";
-import { faUserCheck } from "@fortawesome/free-solid-svg-icons";
-import { faPlugCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { faRightToBracket } from "@fortawesome/free-solid-svg-icons";
-import Image from "next/image";
-
-
+import {
+  Square3Stack3DIcon,
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  ArrowLeftOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
@@ -28,83 +26,68 @@ export default function Navbar() {
   const handleSignOut = async () => {
     try {
       await auth.signOut();
-      toast("Sign Out!!");
-      router.push("/login"); // Redirect to login page after sign-out
+      toast.success("Signed out successfully");
+      router.push("/login");
     } catch (error) {
       console.error("Error signing out: ", error);
+      toast.error("Failed to sign out");
     }
   };
 
   return (
-    <header className="">
-      <div className="container flex flex-1 justify-items-center mx-auto  content justify-evenly flex-wrap p-5 flex-col md:flex-row items-center">
-        <Link
-          href="/"
-          className="flex flex-row  items-center text-customPink mb-4 md:mb-0"
-        >
-          <span className="text-custom-pink font-sans font-extrabold  text-xl">
-            TravelIndia
-          </span>
-          <span className="text-custom-pink font-sans font-bold text-sm">
-            .tours
-          </span>
-        </Link>
-        <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
-          <Link
-            href="/apps"
-            className="mr-5 flex flex-col hover:text-customPink"
-          >
-            <FontAwesomeIcon
-              className="text-custom-dark font-barlow-condensed font-bold text-xl"
-              icon={faShareFromSquare}
-            />
-            <span className="text-custom-dark font-barlow-condensed font-semibold text-sm">
-              Apps
+    <header className="bg-white shadow-md mb-5">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center py-4">
+          <Link href="/" className="flex items-baseline space-x-0">
+            <span className="text-2xl font-bold  text-custom-pink">Travel</span>
+            <span className="text-2xl font-bold  text-custom-pink">India</span>
+            <span className="text-sm font-semibold  text-customPink">
+              .tours
             </span>
           </Link>
-          {user ? (
-            <>
-              <Link
-                href="/profile"
-                className="mr-5 flex flex-col hover:text-customPink"
-              >
-                <FontAwesomeIcon
-                  className="text-custom-dark font-barlow-condensed font-bold text-xl"
-                  icon={faUserCheck}
+          <nav className="flex items-center space-x-6">
+            <NavLink
+              href="/apps"
+              icon={<Square3Stack3DIcon className="w-6 h-6" />}
+              text="Apps"
+            />
+            {user ? (
+              <>
+                <NavLink
+                  href="/profile"
+                  icon={<UserCircleIcon className="w-6 h-6" />}
+                  text="Profile"
                 />
-                <span className="text-custom-dark font-barlow-condensed font-semibold text-sm">
-                  Profile
-                </span>
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="mr-5 hover:text-customPink flex flex-col items-center"
-              >
-                <FontAwesomeIcon
-                  className="text-custom-dark font-barlow-condensed font-bold text-xl"
-                  icon={faPlugCircleXmark}
-                />
-                <span className="text-custom-dark font-barlow-condensed font-semibold text-sm">
-                  signOut
-                </span>
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login"
-              className="mr-5 flex flex-col hover:text-customPink"
-            >
-              <FontAwesomeIcon
-                className="text-custom-dark font-barlow-condensed font-bold text-xl"
-                icon={faRightToBracket}
+                <button
+                  onClick={handleSignOut}
+                  className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+                >
+                  <ArrowRightOnRectangleIcon className="w-6 h-6" />
+                  <span className="text-xs mt-1">Sign Out</span>
+                </button>
+              </>
+            ) : (
+              <NavLink
+                href="/login"
+                icon={<ArrowLeftOnRectangleIcon className="w-6 h-6" />}
+                text="Sign In"
               />
-              <span className="text-custom-dark font-barlow-condensed font-semibold text-sm">
-                signIn
-              </span>
-            </Link>
-          )}
-        </nav>
+            )}
+          </nav>
+        </div>
       </div>
     </header>
+  );
+}
+
+function NavLink({ href, icon, text }) {
+  return (
+    <Link
+      href={href}
+      className="flex flex-col items-center text-gray-600 hover:text-indigo-600 transition-colors duration-200"
+    >
+      {icon}
+      <span className="text-xs mt-1">{text}</span>
+    </Link>
   );
 }

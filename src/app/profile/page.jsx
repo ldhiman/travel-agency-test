@@ -51,14 +51,21 @@ const ProfilePage = () => {
         return {
           text: "Picked Up",
           color: "text-blue-600",
-          canCancel: true,
+          canCancel: false,
           canFetchDetails: true,
         };
       case 104:
         return {
-          text: "Completed",
+          text: "Dropped",
           color: "text-purple-600",
-          canCancel: true,
+          canCancel: false,
+          canFetchDetails: true,
+        };
+      case 105:
+        return {
+          text: "Completed",
+          color: "text-purple-700",
+          canCancel: false,
           canFetchDetails: true,
         };
       case 201:
@@ -145,15 +152,20 @@ const ProfilePage = () => {
 
           setProgress(50);
           setProgressMessage("Fetching trip details...");
-          const tripIds = await getCustomerTripIds(user.uid);
-          const tripDetails = await Promise.all(tripIds.map(getTripDetails));
-          tripDetails.sort(
-            (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
-          );
+          try {
+            const tripIds = await getCustomerTripIds(user.uid);
+            const tripDetails = await Promise.all(tripIds.map(getTripDetails));
+            tripDetails.sort(
+              (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
+            );
 
-          setTrips(tripDetails);
-          setProgress(100);
-          setProgressMessage("Load complete.");
+            setTrips(tripDetails);
+          } catch (err) {
+            setTrips([]);
+          } finally {
+            setProgress(100);
+            setProgressMessage("Load complete.");
+          }
         } catch (error) {
           console.log(error);
           setError("There was an error fetching the data. Please try again.");
@@ -244,7 +256,9 @@ const ProfilePage = () => {
       </div>
 
       <div>
-        <h2 className="text-4xl font-extrabold text-gray-900 mb-6">Trips</h2>
+        <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
+          Trip History
+        </h2>
         {trips.length > 0 ? (
           <ul className="space-y-6">
             {trips.map((trip, index) => {
@@ -278,6 +292,10 @@ const ProfilePage = () => {
                     <span className="font-semibold">Pickup Date/Time:</span>{" "}
                     {new Date(trip.pickupDatetime).toLocaleString()}
                   </p>
+                  <p className="text-lg text-gray-700 mb-4">
+                    <span className="font-semibold">Booking Time:</span>{" "}
+                    {new Date(trip.bookedTime).toLocaleString()}
+                  </p>
                   <div className="flex space-x-4">
                     {canCancel && (
                       <button
@@ -301,7 +319,7 @@ const ProfilePage = () => {
             })}
           </ul>
         ) : (
-          <p className="text-lg text-gray-700">No trips found</p>
+          <p className="text-lg text-gray-700 ml-5">No trips found</p>
         )}
       </div>
 
