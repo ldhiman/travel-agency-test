@@ -2,73 +2,82 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
+const ServiceCard = ({ image, title, description, link }) => (
+  <div className="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
+    <div className="relative h-64">
+      <Image
+        src={image}
+        layout="fill"
+        objectFit="cover"
+        alt={title}
+        className="transition-transform duration-300 transform hover:scale-110"
+      />
+    </div>
+    <div className="p-6">
+      <h2 className="text-2xl font-semibold text-custom-dark mb-3">{title}</h2>
+      <p className="text-gray-600 mb-4">{description}</p>
+      <Link
+        href={link}
+        className="inline-flex items-center text-custom-pink font-medium hover:underline"
+      >
+        Learn More
+        <svg
+          className="w-4 h-4 ml-2"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 12h14"></path>
+          <path d="M12 5l7 7-7 7"></path>
+        </svg>
+      </Link>
+    </div>
+  </div>
+);
+
 export default function OurServices() {
+  const services = [
+    {
+      image: "/oneWay.png",
+      title: "One Way",
+      description:
+        "Efficient transportation for your single-direction journeys.",
+      link: "/one-way",
+    },
+    {
+      image: "/roundTrip.png",
+      title: "Round Trip",
+      description: "Convenient round-trip services for your travel needs.",
+      link: "/round-trip",
+    },
+    {
+      image: "/local.png",
+      title: "Local Trip",
+      description: "Explore your local area with our reliable transportation.",
+      link: "/local-trip",
+    },
+    {
+      image: "/airportPickup.png",
+      title: "Airport Pickup",
+      description:
+        "Stress-free airport transfers for a smooth travel experience.",
+      link: "/airport-pickup",
+    },
+  ];
+
   return (
-    <section class="px-5 py-10 mx-14 border-gray-900 shadow-xl">
-      <div class="container px-5 py-24 mx-auto ">
-        <div class="flex flex-wrap -m-4">
-          <div class="lg:w-1/4 md:w-1/2 p-4 w-full">
-            <Link href="/" class="block relative h-48 rounded overflow-hidden">
-              <Image
-                alt="ecommerce"
-                class="object-cover object-center w-full h-full block"
-                src="/oneWay.png"
-                width={200}
-                height={200}
-              />
-            </Link>
-            <div class="mt-4 flex items-center justify-center">
-              <h2 class="text-custom-dark font-medium text-lg f">One Way</h2>
-            </div>
-          </div>
-          <div class="lg:w-1/4 md:w-1/2 p-4 w-full">
-            <Link href="/" class="block relative h-48 rounded overflow-hidden">
-              <Image
-                alt="ecommerce"
-                class="object-cover object-center w-full h-full block"
-                src="/roundTrip.png"
-                width={200}
-                height={200}
-              />
-            </Link>
-            <div class="mt-4 flex items-center justify-center">
-              <h2 class="text-gray-900 title-font text-lg font-medium">
-                Round Trip
-              </h2>
-            </div>
-          </div>
-          <div class="lg:w-1/4 md:w-1/2 p-4 w-full">
-            <Link href="/" class="block relative h-48 rounded overflow-hidden">
-              <Image
-                alt="ecommerce"
-                class="object-cover object-center w-full h-full block"
-                src="/local.png"
-                width={200}
-                height={200}
-              />
-            </Link>
-            <div class="mt-4 flex items-center justify-center">
-              <h2 class="text-gray-900 title-font text-lg font-medium">
-                Local Trip
-              </h2>
-            </div>
-          </div>
-          <div class="lg:w-1/4 md:w-1/2 p-4 w-full">
-            <Link href="/" class="block relative h-48 rounded overflow-hidden">
-              <Image
-                alt="ecommerce"
-                class="object-cover object-center w-full h-full block"
-                src="/airportPickup.png"
-                width={200}
-                height={200}
-              />
-            </Link>
-            <div class="mt-4 flex items-center justify-center">
-              <h2 class="text-gray-900 title-font text-lg font-medium">
-                Airport Pickup
-              </h2>
-            </div>
-          </div>
+    <section className="bg-gradient-to-b from-white to-blue-50 py-16">
+      <div className="container px-4 mx-auto">
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-custom-dark mb-12">
+          Our Services
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {services.map((service, index) => (
+            <ServiceCard key={index} {...service} />
+          ))}
         </div>
       </div>
     </section>

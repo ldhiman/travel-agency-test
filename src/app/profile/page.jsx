@@ -26,11 +26,11 @@ const ProfilePage = () => {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [tripToCancel, setTripToCancel] = useState(null);
 
-  // Progress states
   const [progress, setProgress] = useState(0);
-  const [progressMessage, setProgressMessage] = useState("Loading...");
+  const [progressMessage, setProgressMessage] = useState(
+    "Loading your profile..."
+  );
 
-  // Maps status IDs to their human-readable names and attributes
   const formatStatus = (id) => {
     switch (id) {
       case 101:
@@ -99,82 +99,71 @@ const ProfilePage = () => {
     }
   };
 
-  // Handles trip cancellation
   const handleCancel = async () => {
     try {
-      await updateTripStatus(tripToCancel, 201); // Status 201 for "Cancelled"
+      await updateTripStatus(tripToCancel, 201);
       const tripIds = await getCustomerTripIds(uid);
       const tripDetails = await Promise.all(tripIds.map(getTripDetails));
-      // Sort trips by bookedTime in descending order
       tripDetails.sort(
         (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
       );
-
       setTrips(tripDetails);
       closeConfirmDialog();
-      toast.success("Trip Cancelled Successfully");
+      toast.success("Your trip has been canceled.");
     } catch (error) {
       console.log(error);
-      toast.error("Error occurred while trying to cancel the trip");
+      toast.error("There was an issue canceling the trip.");
       closeConfirmDialog();
     }
   };
 
-  // Fetches and sets trip details to show in modal
   const handleFetchDetails = async (trip) => {
     try {
       if (trip.driverDetail) setDriverDetails(trip.driverDetail);
       if (trip.vehicleDetail) setVehicleDetails(trip.vehicleDetail);
       setSelectedTripId(trip.Id);
-      setIsModalOpen(true); // Open the modal to show details
+      setIsModalOpen(true);
     } catch (error) {
-      setError("There was an error fetching the details. Please try again.");
+      setError("Failed to fetch trip details.");
     }
   };
 
-  // Closes the modal and resets state
   const closeModal = () => {
     setIsModalOpen(false);
     setDriverDetails({});
     setVehicleDetails({});
   };
 
-  // Fetches user data on authentication state change
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUid(user.uid);
         try {
           setProgress(10);
-          setProgressMessage("Fetching customer details...");
+          setProgressMessage("Loading customer information...");
           const customerDetails = await getCustomerDetails(user.uid);
           setCustomer(customerDetails);
 
           setProgress(50);
-          setProgressMessage("Fetching trip details...");
-          try {
-            const tripIds = await getCustomerTripIds(user.uid);
-            const tripDetails = await Promise.all(tripIds.map(getTripDetails));
-            tripDetails.sort(
-              (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
-            );
+          setProgressMessage("Loading trip information...");
+          const tripIds = await getCustomerTripIds(user.uid);
+          const tripDetails = await Promise.all(tripIds.map(getTripDetails));
+          tripDetails.sort(
+            (a, b) => new Date(b.bookedTime) - new Date(a.bookedTime)
+          );
+          setTrips(tripDetails);
 
-            setTrips(tripDetails);
-          } catch (err) {
-            setTrips([]);
-          } finally {
-            setProgress(100);
-            setProgressMessage("Load complete.");
-          }
+          setProgress(100);
+          setProgressMessage("All data loaded.");
         } catch (error) {
           console.log(error);
-          setError("There was an error fetching the data. Please try again.");
+          setError("Error loading data.");
         } finally {
           setLoading(false);
         }
       } else {
-        toast.error("Please Login Fisrt!!");
-        setError("Please Login First");
+        toast.error("Please log in to continue.");
+        setError("Login required.");
         setLoading(false);
       }
     });
@@ -182,13 +171,11 @@ const ProfilePage = () => {
     return () => unsub();
   }, []);
 
-  // Opens confirmation dialog for trip cancellation
   const openConfirmDialog = (tripId) => {
     setTripToCancel(tripId);
     setIsConfirmDialogOpen(true);
   };
 
-  // Closes confirmation dialog
   const closeConfirmDialog = () => {
     setIsConfirmDialogOpen(false);
     setTripToCancel(null);
@@ -196,7 +183,7 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
+      <div className="flex flex-col justify-center items-center h-screen max-h-80 bg-gradient-to-br from-gray-100 to-gray-200 p-8">
         <div className="w-full max-w-md">
           <p className="text-lg font-semibold text-gray-600 mb-4">
             {progressMessage}
@@ -229,15 +216,17 @@ const ProfilePage = () => {
   if (!customer)
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-100 to-gray-200">
-        <p className="text-lg font-semibold text-gray-600">No customer found</p>
+        <p className="text-lg font-semibold text-gray-600">
+          No customer data available
+        </p>
       </div>
     );
 
   return (
-    <div className="p-8 max-w-4xl mx-auto bg-white shadow-lg rounded-xl border border-gray-300">
+    <div className="p-8 w-auto md:mx-20 mx-3 bg-white shadow-lg rounded-xl border border-gray-300">
       <div className="mb-8">
         <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
-          Customer Details
+          Your Profile
         </h2>
         <div className="space-y-4">
           <p className="text-lg text-gray-700">
@@ -257,7 +246,7 @@ const ProfilePage = () => {
 
       <div>
         <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
-          Trip History
+          Your Trip History
         </h2>
         {trips.length > 0 ? (
           <ul className="space-y-6">
@@ -302,7 +291,7 @@ const ProfilePage = () => {
                         onClick={() => openConfirmDialog(trip.Id)}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300"
                       >
-                        Cancel
+                        Cancel Trip
                       </button>
                     )}
                     {canFetchDetails && (
@@ -319,14 +308,14 @@ const ProfilePage = () => {
             })}
           </ul>
         ) : (
-          <p className="text-lg text-gray-700 ml-5">No trips found</p>
+          <p className="text-lg text-gray-700 ml-5">You have no trips yet.</p>
         )}
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <div className="relative">
           <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-            Details for Trip ID: {selectedTripId}
+            Trip Details - {selectedTripId}
           </h3>
           {driverDetails && (
             <div className="mb-6">
@@ -335,10 +324,17 @@ const ProfilePage = () => {
               </h4>
               <div className="flex items-center space-x-4">
                 <img
+                  loading="lazy"
                   src={driverDetails.profile_picture}
+                  onError={(e) => {
+                    e.target.onerror = null; // Prevents looping in case fallback also fails
+                    e.target.src =
+                      "https://avatars.githubusercontent.com/u/26671790?v=4"; // Fallback URL
+                  }}
                   alt="Driver"
-                  className="w-16 h-16 object-cover rounded-full"
+                  className="w-16 h-16 object-cover rounded-full ring"
                 />
+
                 <div>
                   <p className="text-lg text-gray-700">
                     <span className="font-semibold">Name:</span>{" "}
@@ -355,24 +351,23 @@ const ProfilePage = () => {
           {vehicleDetails && (
             <div>
               <h4 className="text-xl font-semibold text-gray-800 mb-2">
-                Vehicle Details
+                Vehicle Information
               </h4>
               <div className="space-y-2">
                 <p className="text-lg text-gray-700">
                   <span className="font-semibold">Vehicle:</span>{" "}
-                  {vehicleDetails.vehicleMake} ({vehicleDetails.vehicleModel})
+                  {vehicleDetails.vehicleMake} ({vehicleDetails.vehicleModel}
+                  {", "}
+                  {vehicleDetails.vehicleColor})
                 </p>
                 <p className="text-lg text-gray-700">
-                  <span className="font-semibold">Vehicle Number:</span>{" "}
+                  <span className="font-semibold">License Plate:</span>{" "}
                   {vehicleDetails.vehicleNumber}
-                </p>
-                <p className="text-lg text-gray-700">
-                  <span className="font-semibold">Vehicle Type:</span>{" "}
-                  {vehicleDetails.vehicleType}
                 </p>
                 <div className="flex space-x-4">
                   {vehicleDetails.VEHICLE_FRONT && (
                     <img
+                      loading="lazy"
                       src={vehicleDetails.VEHICLE_FRONT}
                       alt="Front View"
                       className="w-24 h-24 object-cover rounded-md border border-gray-300"
@@ -380,6 +375,7 @@ const ProfilePage = () => {
                   )}
                   {vehicleDetails.VEHICLE_BACK && (
                     <img
+                      loading="lazy"
                       src={vehicleDetails.VEHICLE_BACK}
                       alt="Back View"
                       className="w-24 h-24 object-cover rounded-md border border-gray-300"
@@ -410,11 +406,12 @@ const ProfilePage = () => {
           </button>
         </div>
       </Modal>
+
       <ConfirmationDialog
         isOpen={isConfirmDialogOpen}
         onClose={closeConfirmDialog}
         onConfirm={handleCancel}
-        message={`Are you sure you want to cancel trip ID: ${tripToCancel}?`}
+        message={`Are you sure you want to cancel Trip ID: ${tripToCancel}?`}
       />
     </div>
   );

@@ -10,7 +10,6 @@ export default function Home() {
       <HeroSection />
       <ViewsSection />
       <ReviewSection />
-      {/* <ViewsSection /> */}
       <OurServices />
       <InfoSection />
     </div>

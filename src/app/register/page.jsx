@@ -8,6 +8,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { db, auth } from "../firebase";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { User, Mail, Calendar, Phone } from "lucide-react";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -135,102 +136,138 @@ export default function RegisterPage() {
     }
   };
 
-  const DatePickerField = ({ id, label, value, onChange, minDate }) => (
-    <div className="mb-4">
-      <label htmlFor={id} className="leading-7 text-sm text-gray-600">
+  const InputField = ({
+    name,
+    label,
+    type,
+    value,
+    onChange,
+    icon: Icon,
+    disabled = false,
+  }) => (
+    <div className="mb-6 relative">
+      <label
+        htmlFor={name}
+        className="block text-sm font-medium text-gray-700 mb-2"
+      >
         {label}
       </label>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <DatePicker
-          value={value ? new Date(value) : null}
-          onChange={(date) => onChange(date)}
-          renderInput={(params) => <TextField {...params} fullWidth />}
-          minDate={minDate}
-          inputFormat="dd/MM/yyyy"
-          placeholder={`Select ${label.toLowerCase()}`}
+      <div className="relative rounded-md shadow-sm">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
+        <input
+          type={type}
+          name={name}
+          id={name}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          className={`block w-full pl-10 px-5 py-3 sm:text-sm border-gray-300 rounded-md outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
+            disabled ? "bg-gray-100" : ""
+          }`}
+          placeholder={`Enter your ${label.toLowerCase()}`}
+          required
         />
-      </LocalizationProvider>
+      </div>
+    </div>
+  );
+
+  const DatePickerField = ({ id, label, value, onChange }) => (
+    <div className="mb-6 relative">
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-gray-700 mb-2"
+      >
+        {label}
+      </label>
+      <div className="relative rounded-md shadow-sm">
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            value={value ? new Date(value) : null}
+            onChange={(date) => onChange(date)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                InputProps={{
+                  ...params.InputProps,
+                  className:
+                    "pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500",
+                }}
+              />
+            )}
+            inputFormat="dd/MM/yyyy"
+            placeholder={`Select your ${label.toLowerCase()}`}
+          />
+        </LocalizationProvider>
+      </div>
     </div>
   );
 
   return (
-    <div>
-      <div className="container mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Registration Form
-        </h1>
-        <form
-          className="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md"
-          onSubmit={handleSubmit}
-        >
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-              type="text"
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Complete Your Profile
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Please provide your details to complete the registration process
+        </p>
+      </div>
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <InputField
               name="name"
+              label="Full Name"
+              type="text"
               value={formData.name}
               onChange={handleTextChange}
-              placeholder="John Doe"
-              required
+              icon={User}
             />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-              type="email"
+            <InputField
               name="email"
+              label="Email Address"
+              type="email"
               value={formData.email}
               onChange={handleTextChange}
-              required
-              placeholder="john@example.com"
+              icon={Mail}
             />
-          </div>
-          <DatePickerField
-            id="dob"
-            label="Date of Birth"
-            value={formData.dob}
-            onChange={handleDateChange}
-          />
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="contact"
-            >
-              Contact Number
-            </label>
-            <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
-              type="tel"
+            <DatePickerField
+              id="dob"
+              label="Date of Birth"
+              value={formData.dob}
+              onChange={handleDateChange}
+            />
+            <InputField
               name="contact"
+              label="Contact Number"
+              type="tel"
               value={formData.contact}
               onChange={handleTextChange}
-              required
-              disabled // Disable contact field
+              icon={Phone}
+              disabled
             />
-          </div>
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          <button
-            className={`w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-indigo-600 transition duration-300 ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Submitting..." : "Submit"}
-          </button>
-        </form>
+            {error && (
+              <p className="mt-2 text-sm text-red-600" id="email-error">
+                {error}
+              </p>
+            )}
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {loading ? "Submitting..." : "Complete Registration"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

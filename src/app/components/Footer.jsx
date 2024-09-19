@@ -1,43 +1,122 @@
-import Link from 'next/link';
-import React from 'react';
+import Link from "next/link";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebookF } from "@fortawesome/free-brands-svg-icons";
-import { faSquareTwitter } from "@fortawesome/free-brands-svg-icons";
-import { faInstagram, faLinkedin } from "@fortawesome/free-brands-svg-icons";
+import {
+  faFacebookF,
+  faTwitter,
+  faInstagram,
+  faLinkedin,
+} from "@fortawesome/free-brands-svg-icons";
+import {
+  faEnvelope,
+  faPhone,
+  faMapMarkerAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
+const FooterSection = ({ title, children }) => (
+  <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/5 mb-8 md:mb-0">
+    <h3 className="text-custom-pink font-bold text-lg mb-4">{title}</h3>
+    {children}
+  </div>
+);
+
+const FooterLink = ({ href, children }) => (
+  <li className="mb-2">
+    <Link
+      href={href}
+      className="text-gray-600 hover:text-custom-pink transition duration-300"
+    >
+      {children}
+    </Link>
+  </li>
+);
+
+const SocialIcon = ({ href, icon }) => (
+  <Link
+    href={href}
+    className="text-custom-pink hover:text-custom-dark transition duration-300"
+  >
+    <FontAwesomeIcon icon={icon} className="w-5 h-5" />
+  </Link>
+);
 
 export default function Footer() {
   return (
-    <footer className=" mt-10">
-      <div className="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
-        <Link
-          href="/"
-          className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900"
-        >
-          <span className="text-custom-pink font-sans font-extrabold  text-xl">
-            TravelIndia
-          </span>
-          <span className="text-custom-pink font-sans font-bold text-sm">
-            .tours
-          </span>
-        </Link>
-        <p className="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">
-          © Travelindia.tours
-        </p>
-        <span className="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
-          <Link href="/" className="ml-3 text-custom-pink">
-            <FontAwesomeIcon icon={faFacebookF} />
-          </Link>
-          <Link href="/" className="ml-3 text-custom-pink">
-            <FontAwesomeIcon icon={faSquareTwitter} />
-          </Link>
-          <Link href="/" className="ml-3 text-custom-pink">
-            <FontAwesomeIcon icon={faInstagram} />
-          </Link>
-          <Link href="/" className="ml-3 text-custom-pink">
-            <FontAwesomeIcon icon={faLinkedin} />
-          </Link>
-        </span>
+    <footer className="pt-16 pb-8 from-white to-blue-500">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-wrap justify-between">
+          <FooterSection title="About Us">
+            <p className="text-gray-600 mb-4">
+              TravelIndia.tours is your premier destination for exploring the
+              diverse beauty of India through comfortable and reliable cab
+              services.
+            </p>
+            <div className="flex space-x-4">
+              <SocialIcon href="/" icon={faFacebookF} />
+              <SocialIcon href="/" icon={faTwitter} />
+              <SocialIcon href="/" icon={faInstagram} />
+              <SocialIcon href="/" icon={faLinkedin} />
+            </div>
+          </FooterSection>
+
+          <FooterSection title="Quick Links">
+            <ul>
+              <FooterLink href="/services">Our Services</FooterLink>
+              <FooterLink href="/about">About Us</FooterLink>
+              <FooterLink href="/book">Book a Ride</FooterLink>
+              <FooterLink href="/contact">Contact Us</FooterLink>
+            </ul>
+          </FooterSection>
+
+          <FooterSection title="Services">
+            <ul>
+              <FooterLink href="/services/one-way">One Way Trips</FooterLink>
+              <FooterLink href="/services/round-trip">Round Trips</FooterLink>
+              <FooterLink href="/services/local">Local Trips</FooterLink>
+              <FooterLink href="/services/airport">Airport Transfer</FooterLink>
+            </ul>
+          </FooterSection>
+
+          <FooterSection title="Contact Us">
+            <ul className="text-gray-600">
+              <li className="mb-2 flex items-center">
+                <FontAwesomeIcon
+                  icon={faPhone}
+                  className="w-4 h-4 mr-2 text-custom-pink"
+                />
+                +91 1234567890
+              </li>
+              <li className="mb-2 flex items-center">
+                <FontAwesomeIcon
+                  icon={faEnvelope}
+                  className="w-4 h-4 mr-2 text-custom-pink"
+                />
+                support@travelindia.tours
+              </li>
+              <li className="flex items-start">
+                <FontAwesomeIcon
+                  icon={faMapMarkerAlt}
+                  className="w-4 h-4 mr-2 mt-1 text-custom-pink"
+                />
+                Bawana, Delhi, India 110039
+              </li>
+            </ul>
+          </FooterSection>
+        </div>
+
+        <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
+          <div className="flex items-center mb-4 sm:mb-0">
+            <Link
+              href="/"
+              className="flex items-center text-custom-pink font-sans font-extrabold text-xl"
+            >
+              TravelIndia<span className="font-bold text-sm">.tours</span>
+            </Link>
+          </div>
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} TravelIndia.tours. All rights reserved.
+          </p>
+        </div>
       </div>
     </footer>
   );
