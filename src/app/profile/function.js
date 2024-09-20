@@ -33,6 +33,28 @@ export async function getCustomerTripIds(customerId) {
   }
 }
 
+export async function saveTripFeedback(Id, feedback) {
+  console.log(Id, feedback);
+  try {
+    const tripfeedRef = ref(db, `feedbacks/trips/${Id}/${feedback.customerID}`);
+    set(tripfeedRef, feedback);
+  } catch (error) {
+    console.error("Error getting customer trip IDs:", error);
+    throw new Error("Failed to save feedback for trip");
+  }
+}
+
+export const checkExistingFeedback = async (tripId, userId) => {
+  try {
+    const feedbackRef = ref(db, `feedbacks/trips/${tripId}/${userId}`);
+    const snapshot = await get(feedbackRef);
+    return snapshot.exists();
+  } catch (error) {
+    console.error("Error checking existing feedback:", error);
+    return false;
+  }
+};
+
 // Fetch driver details by ID
 const fetchDriverDetail = async (id) => {
   try {
