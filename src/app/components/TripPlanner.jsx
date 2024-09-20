@@ -304,29 +304,68 @@ const TripPlanner = () => {
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-5xl mx-auto mt-8">
-      <h1 className="text-4xl font-bold text-center mb-8">Plan Your Trip</h1>
+    <div className="max-w-5xl mx-auto mt-8 px-4">
+      <h1 className="text-4xl font-bold text-center mb-8 text-blue-600">
+        Plan Your Perfect Trip
+      </h1>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+      <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-          {/* Source Input */}
           <div>
-            {/* <label className="block text-gray-700 text-sm font-bold mb-2">
-              Source
-            </label> */}
-            <div className="relative">
+            <Autocomplete
+              onLoad={(autocomplete) => setSourceAutocomplete(autocomplete)}
+              onPlaceChanged={() => {
+                if (sourceAutocomplete) {
+                  const place = sourceAutocomplete.getPlace();
+                  if (place.geometry) {
+                    setSource(place.formatted_address);
+                    setSourceCoords({
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng(),
+                    });
+                    setSourceLocationName(
+                      place.name || place.formatted_address
+                    );
+                  }
+                }
+              }}
+            >
+              <TextField
+                label="Pickup Location"
+                variant="outlined"
+                fullWidth
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton
+                      aria-label="select source from map"
+                      onClick={() => openMapModal("source")}
+                    >
+                      <LocationOnIcon className="text-blue-500" />
+                    </IconButton>
+                  ),
+                }}
+              />
+            </Autocomplete>
+          </div>
+
+          {tripType !== "HOURLY RENTAL" && (
+            <div>
               <Autocomplete
-                onLoad={(autocomplete) => setSourceAutocomplete(autocomplete)}
+                onLoad={(autocomplete) =>
+                  setDestinationAutocomplete(autocomplete)
+                }
                 onPlaceChanged={() => {
-                  if (sourceAutocomplete) {
-                    const place = sourceAutocomplete.getPlace();
+                  if (destinationAutocomplete) {
+                    const place = destinationAutocomplete.getPlace();
                     if (place.geometry) {
-                      setSource(place.formatted_address);
-                      setSourceCoords({
+                      setDestination(place.formatted_address);
+                      setDestinationCoords({
                         lat: place.geometry.location.lat(),
                         lng: place.geometry.location.lng(),
                       });
-                      setSourceLocationName(
+                      setDestinationLocationName(
                         place.name || place.formatted_address
                       );
                     }
@@ -334,116 +373,48 @@ const TripPlanner = () => {
                 }}
               >
                 <TextField
-                  label="Pickup"
+                  label="Drop Location"
                   variant="outlined"
                   fullWidth
-                  value={source}
-                  onChange={(e) => setSource(e.target.value)}
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
                   InputProps={{
                     endAdornment: (
                       <IconButton
-                        aria-label="select source from map"
-                        onClick={() => openMapModal("source")}
+                        aria-label="select destination from map"
+                        onClick={() => openMapModal("destination")}
                       >
-                        <LocationOnIcon />
+                        <LocationOnIcon className="text-blue-500" />
                       </IconButton>
                     ),
                   }}
                 />
               </Autocomplete>
             </div>
-          </div>
-
-          {/* Destination Input */}
-          {tripType !== "HOURLY RENTAL" && (
-            <div>
-              {/* <label className="block text-gray-700 text-sm font-bold mb-2">
-                Destination
-              </label> */}
-              <div className="relative">
-                <Autocomplete
-                  onLoad={(autocomplete) =>
-                    setDestinationAutocomplete(autocomplete)
-                  }
-                  onPlaceChanged={() => {
-                    if (destinationAutocomplete) {
-                      const place = destinationAutocomplete.getPlace();
-                      if (place.geometry) {
-                        setDestination(place.formatted_address);
-                        setDestinationCoords({
-                          lat: place.geometry.location.lat(),
-                          lng: place.geometry.location.lng(),
-                        });
-                        setDestinationLocationName(
-                          place.name || place.formatted_address
-                        );
-                      }
-                    }
-                  }}
-                >
-                  <TextField
-                    label="Drop Location"
-                    variant="outlined"
-                    fullWidth
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    InputProps={{
-                      endAdornment: (
-                        <IconButton
-                          aria-label="select destination from map"
-                          onClick={() => openMapModal("destination")}
-                        >
-                          <LocationOnIcon />
-                        </IconButton>
-                      ),
-                    }}
-                  />
-                </Autocomplete>
-              </div>
-            </div>
           )}
         </div>
 
-        {/* Trip Type Selection */}
         <div className="mb-8">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Trip Type
-          </label>
+          <h2 className="text-lg font-semibold mb-4 text-gray-700">
+            Choose Your Trip Type
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <button
-              className={`py-2 px-4 rounded-lg font-bold ${
-                tripType === "ONE WAY"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setTripType("ONE WAY")}
-            >
-              One Way
-            </button>
-            <button
-              className={`py-2 px-4 rounded-lg font-bold ${
-                tripType === "ROUND TRIP"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setTripType("ROUND TRIP")}
-            >
-              Round Trip
-            </button>
-            <button
-              className={`py-2 px-4 rounded-lg font-bold ${
-                tripType === "HOURLY RENTAL"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-              onClick={() => setTripType("HOURLY RENTAL")}
-            >
-              Hourly Rental
-            </button>
+            {["ONE WAY", "ROUND TRIP", "HOURLY RENTAL"].map((type) => (
+              <button
+                key={type}
+                className={`py-3 px-4 rounded-lg font-bold transition-colors duration-200 ${
+                  tripType === type
+                    ? "bg-blue-500 text-white shadow-md"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+                onClick={() => setTripType(type)}
+              >
+                {type.charAt(0) + type.slice(1).toLowerCase().replace("_", " ")}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Pickup DateTime */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -478,7 +449,6 @@ const TripPlanner = () => {
           </div>
         </div>
 
-        {/* Return DateTime (Conditional) */}
         {tripType === "ROUND TRIP" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
             <div>
@@ -515,11 +485,10 @@ const TripPlanner = () => {
           </div>
         )}
 
-        {/* Hourly rental (Conditional) */}
         {tripType === "HOURLY RENTAL" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
             <TextField
-              label="Hours"
+              label="Rental Duration (hours)"
               variant="outlined"
               fullWidth
               type="number"
@@ -530,38 +499,68 @@ const TripPlanner = () => {
               value={hourlyRentalHours}
               onChange={handleHourlyRentalHoursChange}
               error={!!error}
-              helperText={error}
+              helperText={error || "Choose between 1 to 8 hours"}
             />
           </div>
         )}
 
-        {/* Error Message */}
         {error && (
-          <div className="text-red-500 text-center font-bold mb-4">{error}</div>
+          <div className="text-red-500 text-center font-bold mb-4 p-2 bg-red-100 rounded">
+            {error}
+          </div>
         )}
 
-        {/* Explore Cabs Button */}
         <button
-          className="bg-blue-500 text-white py-3 px-6 rounded-lg font-bold block w-full"
+          className="bg-blue-500 text-white py-3 px-6 rounded-lg font-bold block w-full transition-colors duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           onClick={handleExploreCabs}
-          disabled={loading} // Disable button when loading
+          disabled={loading}
         >
-          {loading ? "Loading..." : "Explore Cabs"}
+          {loading ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Processing...
+            </span>
+          ) : (
+            "Find Available Cabs"
+          )}
         </button>
       </div>
 
       {/* Map Modal */}
       <Modal open={mapOpen} onClose={() => setMapOpen(false)}>
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative">
             <IconButton
               onClick={() => setMapOpen(false)}
-              className="absolute top-2 right-2"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
               <CloseIcon />
             </IconButton>
-
-            <div className="h-96 w-full">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">
+              {currentMapType === "source"
+                ? "Select Pickup Location"
+                : "Select Drop Location"}
+            </h2>
+            <div className="h-96 w-full rounded-lg overflow-hidden">
               {isLoaded ? (
                 <GoogleMap
                   mapContainerStyle={{ width: "100%", height: "100%" }}
@@ -577,7 +576,6 @@ const TripPlanner = () => {
                       icon="https://mt.google.com/vt/icon/name=icons/spotlight/directions_destination_measle_8x.png&scale=1.1"
                     />
                   )}
-
                   {sourceCoords && (
                     <Marker
                       position={sourceCoords}
@@ -585,7 +583,6 @@ const TripPlanner = () => {
                       icon="http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
                     />
                   )}
-
                   {destinationCoords && (
                     <Marker
                       position={destinationCoords}
@@ -595,9 +592,16 @@ const TripPlanner = () => {
                   )}
                 </GoogleMap>
               ) : (
-                <p>Loading map...</p>
+                <p className="text-center text-gray-600">Loading map...</p>
               )}
             </div>
+            <button
+              onClick={handleCurrentLocationClick}
+              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg font-bold flex items-center justify-center hover:bg-blue-600 transition-colors duration-200"
+            >
+              <MyLocationIcon className="mr-2" />
+              Use Current Location
+            </button>
           </div>
         </div>
       </Modal>
@@ -606,8 +610,12 @@ const TripPlanner = () => {
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <DialogTitle>Confirm Location</DialogTitle>
         <DialogContent>
-          <p>Address: {selectedAddress}</p>
-          <p>Coordinates: {JSON.stringify(selectedLocation)}</p>
+          <p className="mb-2">
+            <strong>Address:</strong> {selectedAddress}
+          </p>
+          <p>
+            <strong>Coordinates:</strong> {JSON.stringify(selectedLocation)}
+          </p>
         </DialogContent>
         <DialogActions>
           <Button
@@ -623,9 +631,9 @@ const TripPlanner = () => {
             onClick={() => {
               setIsDialogOpen(false);
             }}
-            color="primary"
+            color="secondary"
           >
-            Close
+            Cancel
           </Button>
         </DialogActions>
       </Dialog>

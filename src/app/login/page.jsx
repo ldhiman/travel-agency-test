@@ -12,6 +12,7 @@ import {
   signInWithCredential,
 } from "../firebase";
 import { ref, set, update } from "firebase/database";
+import { Phone, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -114,59 +115,113 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
-      <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
-        <h1 className="font-bold text-center text-2xl mb-5">
-          Travelindia.tours
-        </h1>
-        <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-          <div className="px-5 py-7">
-            <label className="font-semibold text-sm text-gray-600 pb-1 block">
-              Mobile Number
-            </label>
-            <div className="flex items-center border rounded-lg mb-5">
-              <span className="px-3 py-2 text-gray-600 bg-gray-200 border-r">
-                +91
-              </span>
-              <input
-                type="text"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm outline-none"
-                placeholder="Phone number"
-              />
+    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white shadow-lg rounded-xl p-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Welcome to Travelindia.tours
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Sign in or create an account to start your journey
+          </p>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="phone-number" className="sr-only">
+                Phone number
+              </label>
+              <div className="flex items-center border rounded-t-md">
+                <span className="px-3 py-3 text-gray-500 bg-gray-50 border-r">
+                  +91
+                </span>
+                <div className="relative flex-grow">
+                  <Phone className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="phone-number"
+                    name="phone"
+                    type="tel"
+                    disabled={otpSent}
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-3 border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Your phone number"
+                  />
+                </div>
+              </div>
             </div>
-            <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
-            <button
-              onClick={requestOtp}
-              disabled={otpSent}
-              className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
-            >
-              Send OTP
-            </button>
-
             {otpSent && (
-              <>
-                <br />
-                <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                  Verify OTP
+              <div>
+                <label htmlFor="otp" className="sr-only">
+                  OTP
                 </label>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
-                  placeholder="OTP"
-                />
-                <button
-                  onClick={verifyOtp}
-                  className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
-                >
-                  Submit OTP
-                </button>
-              </>
+                <div className="relative">
+                  <Lock className="absolute top-3 left-3 h-5 w-5 text-gray-400" />
+                  <input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="appearance-none rounded-b-md relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="Enter OTP"
+                  />
+                </div>
+              </div>
             )}
           </div>
+
+          <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
+
+          <div>
+            {!otpSent ? (
+              <button
+                onClick={requestOtp}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <ArrowRight
+                    className="h-5 w-5 text-blue-500 group-hover:text-blue-400"
+                    aria-hidden="true"
+                  />
+                </span>
+                Send OTP
+              </button>
+            ) : (
+              <button
+                onClick={verifyOtp}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <Lock
+                    className="h-5 w-5 text-blue-500 group-hover:text-blue-400"
+                    aria-hidden="true"
+                  />
+                </span>
+                Verify OTP
+              </button>
+            )}
+          </div>
+        </form>
+        <div className="mt-6">
+          <p className="text-center text-sm text-gray-600">
+            By signing in, you agree to our{" "}
+            <a
+              href="#"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a
+              href="#"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
+              Privacy Policy
+            </a>
+          </p>
         </div>
       </div>
     </div>
