@@ -61,19 +61,19 @@ export default function Footer() {
 
           <FooterSection title="Quick Links">
             <ul>
-              <FooterLink href="/services">Our Services</FooterLink>
+              <FooterLink href="/">Our Services</FooterLink>
               <FooterLink href="/about">About Us</FooterLink>
-              <FooterLink href="/book">Book a Ride</FooterLink>
+              <FooterLink href="/policy">Privacy Policy</FooterLink>
               <FooterLink href="/contact">Contact Us</FooterLink>
             </ul>
           </FooterSection>
 
           <FooterSection title="Services">
             <ul>
-              <FooterLink href="/services/one-way">One Way Trips</FooterLink>
-              <FooterLink href="/services/round-trip">Round Trips</FooterLink>
-              <FooterLink href="/services/local">Local Trips</FooterLink>
-              <FooterLink href="/services/airport">Airport Transfer</FooterLink>
+              <FooterLink href="/">One Way Trips</FooterLink>
+              <FooterLink href="/">Round Trips</FooterLink>
+              <FooterLink href="/">Local Trips</FooterLink>
+              <FooterLink href="/">Airport Transfer</FooterLink>
             </ul>
           </FooterSection>
 
@@ -84,7 +84,7 @@ export default function Footer() {
                   icon={faPhone}
                   className="w-4 h-4 mr-2 text-custom-pink"
                 />
-                +91 1234567890
+                +91 70113 07838
               </li>
               <li className="mb-2 flex items-center">
                 <FontAwesomeIcon
