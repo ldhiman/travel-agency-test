@@ -72,8 +72,7 @@ export default function Footer() {
             <ul>
               <FooterLink href="/">One Way Trips</FooterLink>
               <FooterLink href="/">Round Trips</FooterLink>
-              <FooterLink href="/">Local Trips</FooterLink>
-              <FooterLink href="/">Airport Transfer</FooterLink>
+              <FooterLink href="/">Hourly Rental</FooterLink>
             </ul>
           </FooterSection>
 

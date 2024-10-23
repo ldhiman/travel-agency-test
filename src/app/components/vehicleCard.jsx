@@ -1,5 +1,13 @@
 import Image from "next/image";
-import { Users, Clock, MapPin, Info } from "lucide-react";
+import { Users, Info } from "lucide-react";
+import {
+  Clock,
+  MapPin,
+  Calendar,
+  TrendingUp,
+  CarTaxiFront,
+  ArrowLeftRight,
+} from "lucide-react";
 
 const vehicleImages = {
   sedan: "/sedan.png",
@@ -23,14 +31,53 @@ const vehicleCapacity = {
   innovacrysta: 7,
 };
 
-const VehicleCard = ({ type, total, info, distance, duration, onClick }) => {
-  const imageSrc = vehicleImages[type];
-  const capacity = vehicleCapacity[type] || 4;
+const VehicleCard = ({
+  type,
+  fareDetails,
+  distance,
+  duration,
+  tripType,
+  onSelect,
+}) => {
+  const imageSrc = vehicleImages[type.toLowerCase()] || vehicleImages.sedan;
+  const capacity = vehicleCapacity[type.toLowerCase()] || 4;
 
   const formatVehicleType = (type) => {
-    if (type === "traveller12_14") return "Traveller 12-14 Seater";
-    if (type === "traveller16") return "Traveller 16 Seater";
-    return type.charAt(0).toUpperCase() + type.slice(1);
+    if (type.toLowerCase() === "traveller12_14")
+      return "Traveller 12-14 Seater";
+    if (type.toLowerCase() === "traveller16") return "Traveller 16 Seater";
+    return type
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  // Create fare breakdown info string
+  const getFareBreakdown = () => {
+    const items = [];
+    let note = "Note: ";
+    if (fareDetails.baseFare >= 0)
+      items.push(`Base Fare: ₹${fareDetails.baseFare.toFixed(2)}`);
+    if (fareDetails.driverAllowance >= 0)
+      items.push(
+        `Driver Allowance: ₹${fareDetails.driverAllowance.toFixed(2)}`
+      );
+    if (fareDetails.stateTax > 0) {
+      items.push(`State Tax: ₹${fareDetails.stateTax.toFixed(2)}`);
+    } else {
+      note += "State Tax not included!!\n";
+    }
+    if (fareDetails.tollTax && fareDetails.tollTax > 0) {
+      items.push(`Toll Tax: ₹${fareDetails.tollTax.toFixed(2)}`);
+    } else {
+      note += "Toll Tax not included!!\n";
+    }
+    if (fareDetails.nightDrop && fareDetails.nightDrop > 0)
+      items.push(`Night Drop: ₹${fareDetails.nightDrop.toFixed(2)}`);
+    if (fareDetails.extraCharge && tripType === "HOURLY RENTAL")
+      items.push(`Extra Hours: ₹${fareDetails.extraCharge.toFixed(2)}`);
+    if (fareDetails.gst >= 0) items.push(`GST: ₹${fareDetails.gst.toFixed(2)}`);
+    return items.join("\n") + "\n\n" + note;
   };
 
   return (
@@ -56,7 +103,9 @@ const VehicleCard = ({ type, total, info, distance, duration, onClick }) => {
               <h3 className="text-2xl font-bold text-gray-800">
                 {formatVehicleType(type)}
               </h3>
-              <p className="text-3xl font-semibold text-indigo-600">₹{total}</p>
+              <p className="text-3xl font-semibold text-indigo-600">
+                ₹{fareDetails.totalFare.toFixed(2)}
+              </p>
             </div>
             <div className="flex space-x-4 text-sm text-gray-600 mb-4">
               <div className="flex items-center">
@@ -74,13 +123,13 @@ const VehicleCard = ({ type, total, info, distance, duration, onClick }) => {
                 Fare Breakdown:
               </p>
               <p className="text-sm text-gray-600 whitespace-pre-line">
-                {info}
+                {getFareBreakdown()}
               </p>
             </div>
           </div>
           <button
+            onClick={() => onSelect(type, fareDetails.totalFare)}
             className="w-full bg-indigo-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-600 transition-colors duration-300"
-            onClick={onClick}
           >
             Select This Vehicle
           </button>
@@ -90,4 +139,53 @@ const VehicleCard = ({ type, total, info, distance, duration, onClick }) => {
   );
 };
 
-export default VehicleCard;
+const TripDetailsCard = ({ tripData }) => {
+  const formatDateTime = (timestamp) => {
+    return new Date(timestamp).toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-lg mb-8 p-6">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold text-gray-800">Trip Details</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex items-center">
+          <TrendingUp className="mr-2 text-indigo-500" />
+          <span className="font-semibold">{tripData.tripType}</span>
+        </div>
+        <div className="flex items-center">
+          <MapPin className="mr-2 text-green-500" />
+          <span className="truncate">{tripData.source}</span>
+        </div>
+        {tripData.destination && (
+          <div className="flex items-center">
+            <ArrowLeftRight className="mr-2 text-green-500" />
+            <span className="truncate">{tripData.destination}</span>
+          </div>
+        )}
+        <div className="flex items-center">
+          <Calendar className="mr-2 text-red-500" />
+          <span>{formatDateTime(tripData.pickupDatetime)}</span>
+        </div>
+        {tripData.distanceData?.distance && (
+          <div className="flex items-center">
+            <CarTaxiFront className="mr-2 text-blue-500" />
+            <span>{tripData.distanceData.distance}</span>
+          </div>
+        )}
+        {tripData.distanceData?.duration && (
+          <div className="flex items-center">
+            <Clock className="mr-2 text-purple-500" />
+            <span>{tripData.distanceData.duration}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export { VehicleCard, TripDetailsCard };

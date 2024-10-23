@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 export default function About() {
   return (
@@ -6,19 +6,18 @@ export default function About() {
       <h1 className="text-4xl font-bold mb-6 text-center">About Us</h1>
 
       <p className="mb-4">
-        {`
-        Welcome to ${`<strong>Travel India</strong>`}, your trusted travel partner
+        Welcome to <strong>Travel India</strong>, your trusted travel partner
         for exploring the rich and diverse beauty of India. Our mission is to
         provide seamless, enjoyable, and unforgettable travel experiences to
         customers across the globe. With a deep passion for tourism and a
         commitment to customer satisfaction, we strive to make every journey
-        memorable.`}
+        memorable.
       </p>
 
       <h2 className="text-2xl font-semibold mt-6 mb-4">Who We Are</h2>
       <p className="mb-4">
         {`
-        Established in [Year], Travel India was founded with a simple goal: to
+        Established in 2024, Travel India was founded with a simple goal: to
         make travel easy, accessible, and enjoyable for everyone. We specialize
         in curating unique travel experiences, whether you're looking to explore
         the serene landscapes of Kerala, the vibrant culture of Rajasthan, or
@@ -82,7 +81,7 @@ export default function About() {
           <strong>Email:</strong> support@travelindia.tours
         </li>
         <li>
-          <strong>Phone:</strong>  +91 70113 07838
+          <strong>Phone:</strong> +91 70113 07838
         </li>
         <li>
           <strong>Address:</strong> Bawana, Delhi, India 110039

@@ -217,7 +217,9 @@ const TripPlanner = () => {
       };
       router.push(
         "/cabSelection?" +
-          new URLSearchParams({ data: btoa(JSON.stringify(completeTripData)) })
+          new URLSearchParams({
+            data: btoa(encodeURIComponent(JSON.stringify(completeTripData))),
+          })
       );
     } catch (error) {
       toast.error("An error occurred while processing the trip.");
