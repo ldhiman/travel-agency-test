@@ -45,26 +45,26 @@ export default function OurServices() {
       title: "One Way",
       description:
         "Efficient transportation for your single-direction journeys.",
-      link: "/",
+      link: "/one-way",
     },
     {
       image: "/roundTrip.png",
       title: "Round Trip",
       description: "Convenient round-trip services for your travel needs.",
-      link: "/",
+      link: "/round-trip",
     },
     {
       image: "/local.png",
       title: "Local Trip",
       description: "Explore your local area with our reliable transportation.",
-      link: "/",
+      link: "/local-trip",
     },
     {
       image: "/airportPickup.png",
       title: "Airport Pickup",
       description:
         "Stress-free airport transfers for a smooth travel experience.",
-      link: "/",
+      link: "/airport-pickup",
     },
   ];
 

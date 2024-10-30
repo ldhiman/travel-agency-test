@@ -83,10 +83,7 @@ export default function Footer() {
                   icon={faPhone}
                   className="w-4 h-4 mr-2 text-custom-pink"
                 />
-                <ul className="flex items-center flex-col">
-                  <li>+91 9266332195</li>
-                  <li>+91 9266332196</li>
-                </ul>
+                +91 70113 07838
               </li>
               <li className="mb-2 flex items-center">
                 <FontAwesomeIcon
