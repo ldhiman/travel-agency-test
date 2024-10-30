@@ -81,7 +81,7 @@ export default function About() {
           <strong>Email:</strong> support@travelindia.tours
         </li>
         <li>
-          <strong>Phone:</strong> +91 70113 07838
+          <strong>Phone:</strong> {`+91 9266332195 , +91 9266332196 `}
         </li>
         <li>
           <strong>Address:</strong> Bawana, Delhi, India 110039

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const Contact = () => {
@@ -25,7 +26,7 @@ const Contact = () => {
         <p>
           <strong>Phone:</strong>{" "}
           <a href="tel:+917011307838" className="text-blue-500 hover:underline">
-            +91 70113 07838
+            {`+91 9266332195 , +91 9266332196 `}
           </a>
         </p>
         <p>
@@ -36,34 +37,34 @@ const Contact = () => {
       <div className="mt-6">
         <h2 className="text-xl font-semibold text-gray-700">Follow Us</h2>
         <p className="mt-2">
-          <a
-            href="https://www.facebook.com"
+          <Link
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             Facebook
-          </a>{" "}
+          </Link>
           |
-          <a
-            href="https://www.twitter.com"
+          <Link
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             {" "}
             Twitter
-          </a>{" "}
+          </Link>{" "}
           |
-          <a
-            href="https://www.instagram.com"
+          <Link
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             {" "}
             Instagram
-          </a>
+          </Link>
         </p>
       </div>
     </div>

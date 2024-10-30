@@ -45,21 +45,21 @@ export default function ReviewSection() {
       title: "Exciting Packages",
       description:
         "Discover our curated travel packages for unforgettable experiences.",
-      link: "/packages",
+      link: "/",
     },
     {
       image: "/driver.jpg",
       title: "Professional Drivers",
       description:
         "Meet our experienced and courteous drivers for a safe journey.",
-      link: "/drivers",
+      link: "/",
     },
     {
       image: "/cars.jpg",
       title: "Premium Vehicles",
       description:
         "Choose from our fleet of comfortable and well-maintained vehicles.",
-      link: "/vehicles",
+      link: "/",
     },
   ];
 
