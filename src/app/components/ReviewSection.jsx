@@ -45,24 +45,23 @@ export default function ReviewSection() {
       title: "Exciting Packages",
       description:
         "Discover our curated travel packages for unforgettable experiences.",
-      link: "/",
+      link: "/packages",
     },
     {
       image: "/driver.jpg",
       title: "Professional Drivers",
       description:
         "Meet our experienced and courteous drivers for a safe journey.",
-      link: "/",
+      link: "/drivers",
     },
     {
       image: "/cars.jpg",
       title: "Premium Vehicles",
       description:
         "Choose from our fleet of comfortable and well-maintained vehicles.",
-      link: "/",
+      link: "/vehicles",
     },
   ];
-
 
   return (
     <section className="bg-gradient-to-b from-blue-50 to-white py-16">
