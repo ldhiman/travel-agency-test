@@ -45,28 +45,29 @@ export default function OurServices() {
       title: "One Way",
       description:
         "Efficient transportation for your single-direction journeys.",
-      link: "/one-way",
+      link: "/",
     },
     {
       image: "/roundTrip.png",
       title: "Round Trip",
       description: "Convenient round-trip services for your travel needs.",
-      link: "/round-trip",
+      link: "/",
     },
     {
       image: "/local.png",
       title: "Local Trip",
       description: "Explore your local area with our reliable transportation.",
-      link: "/local-trip",
+      link: "/",
     },
     {
       image: "/airportPickup.png",
       title: "Airport Pickup",
       description:
         "Stress-free airport transfers for a smooth travel experience.",
-      link: "/airport-pickup",
+      link: "/",
     },
   ];
+
 
   return (
     <section className="bg-gradient-to-b from-white to-blue-50 py-16">
