@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const Contact = () => {
   return (
@@ -36,7 +37,7 @@ const Contact = () => {
       <div className="mt-6">
         <h2 className="text-xl font-semibold text-gray-700">Follow Us</h2>
 
-<p className="mt-2">
+        <p className="mt-2">
           <Link
             href="/"
             target="_blank"
@@ -66,7 +67,6 @@ const Contact = () => {
             Instagram
           </Link>
         </p>
-
       </div>
     </div>
   );
