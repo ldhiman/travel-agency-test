@@ -126,10 +126,17 @@ export default function Policy() {
         contact us at:
       </p>
       <ul className="list-none pl-0 mb-4">
-        <li>Email:  support@travelindia.tours </li>
-        <li>Phone: +91 70113 07838 </li>
-        <li>Address:  Bawana, Delhi, India 110039 </li>
+        <li>
+          <strong>Email:</strong> support@travelindia.tours
+        </li>
+        <li>
+          <strong>Phone:</strong> {`+91 9266332195 , +91 9266332196 `}
+        </li>
+        <li>
+          <strong>Address:</strong> Bawana, Delhi, India 110039
+        </li>
       </ul>
+
     </div>
   );
 }
