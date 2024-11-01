@@ -35,36 +35,38 @@ const Contact = () => {
 
       <div className="mt-6">
         <h2 className="text-xl font-semibold text-gray-700">Follow Us</h2>
-        <p className="mt-2">
-          <a
-            href="https://www.facebook.com"
+
+<p className="mt-2">
+          <Link
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             Facebook
-          </a>{" "}
+          </Link>{" "}
           |
-          <a
-            href="https://www.twitter.com"
+          <Link
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             {" "}
             Twitter
-          </a>{" "}
+          </Link>{" "}
           |
-          <a
-            href="https://www.instagram.com"
+          <Link
+            href="/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline"
           >
             {" "}
             Instagram
-          </a>
+          </Link>
         </p>
+
       </div>
     </div>
   );
