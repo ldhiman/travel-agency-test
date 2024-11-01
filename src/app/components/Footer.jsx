@@ -76,14 +76,17 @@ export default function Footer() {
             </ul>
           </FooterSection>
 
-          <FooterSection title="Contact Us">
+ <FooterSection title="Contact Us">
             <ul className="text-gray-600">
               <li className="mb-2 flex items-center">
                 <FontAwesomeIcon
                   icon={faPhone}
                   className="w-4 h-4 mr-2 text-custom-pink"
                 />
-                +91 70113 07838
+                <ul>
+                  <li>{`+91 9266332195`}</li>
+                  <li>{`+91 9266332196`}</li>
+                </ul>
               </li>
               <li className="mb-2 flex items-center">
                 <FontAwesomeIcon
@@ -101,6 +104,11 @@ export default function Footer() {
               </li>
             </ul>
           </FooterSection>
+
+
+
+
+          
         </div>
 
         <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
