@@ -37,8 +37,8 @@ const TripConfirmation = () => {
           {/* Confirmation Message */}
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
             <p className="text-gray-700 leading-relaxed">
-              Your journey is all set! We've processed your booking and can't
-              wait to serve you with the best ride.
+              Your journey is all set! We&apos;ve processed your booking and
+              can&apos;t wait to serve you with the best ride.
             </p>
           </div>
 
