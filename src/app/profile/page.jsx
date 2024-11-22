@@ -29,6 +29,7 @@ import {
   SortAsc,
   SortDesc,
   Star,
+  BadgeIndianRupee,
 } from "lucide-react";
 
 const ProfilePage = () => {
@@ -66,6 +67,14 @@ const ProfilePage = () => {
 
   const formatStatus = (id) => {
     switch (id) {
+      case 100:
+        return {
+          text: "Pay Trip Confirmation Fee",
+          color: "text-blue-600",
+          canCancel: true,
+          canFetchDetails: false,
+          canLeaveFeedback: false,
+        };
       case 101:
         return {
           text: "Booked",
@@ -166,6 +175,18 @@ const ProfilePage = () => {
       setIsModalOpen(true);
     } catch (error) {
       setError("Failed to fetch trip details.");
+    }
+  };
+
+  const handleAdvanceFee = async (trip) => {
+    try {
+      if (trip.paymentLink && trip.paymentLink.short_url) {
+        window.open(trip.paymentLink.short_url, "_blank");
+      } else {
+        toast.error("Some Error Occur!!");
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong!!");
     }
   };
 
@@ -499,6 +520,15 @@ const ProfilePage = () => {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-4 mt-4">
+                    {trip.status === 100 && (
+                      <button
+                        onClick={() => handleAdvanceFee(trip)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center"
+                      >
+                        <BadgeIndianRupee className="mr-2 h-5 w-5" /> Pay &
+                        Confirm Trip
+                      </button>
+                    )}
                     {canCancel && (
                       <button
                         onClick={() => openConfirmDialog(trip.Id)}
