@@ -139,9 +139,17 @@ const ProfilePage = () => {
           canFetchDetails: false,
           canLeaveFeedback: false,
         };
+      case 204:
+        return {
+          text: "Cancelled - Advance Fee not paid!!",
+          color: "text-red-700",
+          canCancel: false,
+          canFetchDetails: false,
+          canLeaveFeedback: false,
+        };
       default:
         return {
-          text: "Unknown Status",
+          text: `Unknown Status (${id})`,
           color: "text-gray-600",
           canCancel: false,
           canFetchDetails: false,

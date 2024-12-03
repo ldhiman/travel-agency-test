@@ -91,7 +91,7 @@ const ConfirmCab = () => {
           .then(() => {
             console.log("Trip ID saved under customer trips.");
             toast.success("Your trip has been confirmed successfully!");
-            router.push("/profile");
+            router.replace("/profile");
           })
           .catch((error) => {
             console.error("Failed to save trip ID under customer trips", error);

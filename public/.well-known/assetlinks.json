@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.travel.india",
+      "sha256_cert_fingerprints": [
+        "75:77:55:D9:68:62:23:F4:FA:50:1D:DC:F0:1B:C6:23:BB:E5:2A:DA:CF:6B:4A:C8:33:AA:C8:25:2D:7D:41:C8"
+      ]
+    }
+  }
+]
