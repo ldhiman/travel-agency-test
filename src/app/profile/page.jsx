@@ -141,7 +141,7 @@ const ProfilePage = () => {
         };
       case 204:
         return {
-          text: "Cancelled - Advance Fee not paid!!",
+          text: "Cancelled - Confirmation Fee not Paid",
           color: "text-red-700",
           canCancel: false,
           canFetchDetails: false,

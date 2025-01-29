@@ -76,7 +76,7 @@ export default function Footer() {
             </ul>
           </FooterSection>
 
- <FooterSection title="Contact Us">
+          <FooterSection title="Contact Us">
             <ul className="text-gray-600">
               <li className="mb-2 flex items-center">
                 <FontAwesomeIcon
@@ -100,15 +100,11 @@ export default function Footer() {
                   icon={faMapMarkerAlt}
                   className="w-4 h-4 mr-2 mt-1 text-custom-pink"
                 />
-                Bawana, Delhi, India 110039
+                Ground Floor, Plot No. G-47 Kh. No. 103/4, House No. G-47, BIK-G
+                Rajeev Nagar, New Delhi, North Delhi, Delhi, 110086
               </li>
             </ul>
           </FooterSection>
-
-
-
-
-          
         </div>
 
         <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center">
@@ -121,7 +117,8 @@ export default function Footer() {
             </Link>
           </div>
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} TravelIndia.tours. All rights reserved.
+            © COPYRIGHT {new Date().getFullYear()} Travel India - All rights
+            reserved.
           </p>
         </div>
       </div>

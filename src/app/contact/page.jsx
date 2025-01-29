@@ -30,7 +30,9 @@ const Contact = () => {
           </a>
         </p>
         <p>
-          <strong>Address:</strong> Bawana, Delhi, India 110039
+          <strong>Address:</strong> Ground Floor, Plot No. G-47 Kh. No. 103/4,
+          House No. G-47, BIK-G Rajeev Nagar, New Delhi, North Delhi, Delhi,
+          110086
         </p>
       </div>
 
