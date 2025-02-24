@@ -160,6 +160,11 @@ const ProfilePage = () => {
 
   const handleCancel = async () => {
     try {
+      const trip = trips.find((trip) => trip.Id === tripToCancel);
+      if (!trip) {
+        toast.error("Trip not found");
+        return;
+      }
       if (trip.pickupDatetime - 60 * 60 * 1000 > Date.now()) {
         toast.error(
           "Trip can be canceled only up to 1 hour before pickup time"
