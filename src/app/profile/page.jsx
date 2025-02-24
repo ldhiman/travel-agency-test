@@ -160,6 +160,12 @@ const ProfilePage = () => {
 
   const handleCancel = async () => {
     try {
+      if (trip.pickupDatetime - 60 * 60 * 1000 > Date.now()) {
+        toast.error(
+          "Trip can be canceled only up to 1 hour before pickup time"
+        );
+        return;
+      }
       await updateTripStatus(tripToCancel, 201);
       const updatedTrips = trips.map((trip) =>
         trip.Id === tripToCancel ? { ...trip, status: 201 } : trip
@@ -498,8 +504,15 @@ const ProfilePage = () => {
                       </p>
                       <p className="text-lg text-gray-700 mb-2 flex items-baseline">
                         <MapPin className="mr-2 h-5 w-5 text-red-600" />
-                        <span className="font-semibold">To:</span>{" "}
-                        {trip.destination}
+                        <span className="font-semibold">
+                          $
+                          {trip.tripType == "HOURLY RENTAL"
+                            ? "Duration:"
+                            : "To:"}
+                        </span>{" "}
+                        {trip.tripType == "HOURLY RENTAL"
+                          ? trip.hours
+                          : trip.destination}
                       </p>
                       <p className="text-lg mb-2 flex items-baseline">
                         <AlertCircle className="mr-2 h-5 w-5 text-blue-600" />
@@ -513,7 +526,7 @@ const ProfilePage = () => {
                       <p className="text-lg text-gray-700 mb-2 flex items-baseline">
                         <DollarSign className="mr-2 h-5 w-5 text-green-600" />
                         <span className="font-semibold">Cost:</span> Rs.{" "}
-                        {trip.totalCost}
+                        {parseFloat(trip.totalCost).toFixed(2)}
                       </p>
                       <p className="text-lg text-gray-700 mb-2 flex items-baseline">
                         <Clock className="mr-2 h-5 w-5 text-blue-600" />

@@ -29,7 +29,12 @@ const libraries = ["places"];
 const center = { lat: 20.5937, lng: 78.9629 }; // Default center
 
 const TripPlanner = () => {
-  const [pickupDatetime, setPickupDatetime] = useState(null);
+  // const [pickupDatetime, setPickupDatetime] = useState(null);
+  const [pickupDatetime, setPickupDatetime] = useState(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 35); // Set time 35 minutes from now
+    return now.getTime(); // Format for input[type="datetime-local"]
+  });
   const [returnDatetime, setReturnDatetime] = useState(null);
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
