@@ -33,7 +33,7 @@ const TripPlanner = () => {
   const [pickupDatetime, setPickupDatetime] = useState(() => {
     const now = new Date();
     now.setMinutes(now.getMinutes() + 35); // Set time 35 minutes from now
-    return now.getTime(); // Format for input[type="datetime-local"]
+    return now; // Format for input[type="datetime-local"]
   });
   const [returnDatetime, setReturnDatetime] = useState(null);
   const [source, setSource] = useState("");
@@ -607,7 +607,7 @@ const TripPlanner = () => {
               className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg font-bold flex items-center justify-center hover:bg-blue-600 transition-colors duration-200"
             >
               <MyLocationIcon className="mr-2" />
-              Use Current Location
+              Current Location
             </button>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ref, push, set } from "firebase/database";
+import { ref, push, set, get } from "firebase/database";
 import { db, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import toast from "react-hot-toast";
@@ -60,7 +60,9 @@ const ConfirmCab = () => {
   const generateTripID = () => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let tripID = "";
-    for (let i = 0; i < 12; i++) {
+    const length = Math.floor(Math.random() * 6) + 10; // Random length between 10-15
+
+    for (let i = 0; i < length; i++) {
       // Length can be adjusted (10-15)
       tripID += characters.charAt(
         Math.floor(Math.random() * characters.length)
