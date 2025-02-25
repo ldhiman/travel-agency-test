@@ -57,7 +57,40 @@ const ConfirmCab = () => {
     fetchCabData();
   }, [searchParams]);
 
-  const saveTripData = () => {
+  const generateTripID = () => {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let tripID = "";
+    for (let i = 0; i < 12; i++) {
+      // Length can be adjusted (10-15)
+      tripID += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return tripID;
+  };
+
+  const getUniqueTripID = async () => {
+    let tripID;
+    let isUnique = false;
+
+    while (!isUnique) {
+      tripID = generateTripID();
+      const tripRef = ref(db, `trips/${tripID}`);
+
+      try {
+        const snapshot = await get(tripRef);
+        if (!snapshot.exists()) {
+          isUnique = true;
+        }
+      } catch (error) {
+        console.error("Error checking trip ID uniqueness:", error);
+      }
+    }
+
+    return tripID;
+  };
+
+  const saveTripData = async () => {
     if (!cabData) {
       toast.error("No Trip Data Available!");
       return;
@@ -69,6 +102,8 @@ const ConfirmCab = () => {
 
     setLoading(true);
 
+    const tripID = await getUniqueTripID(); // Ensure tripID is unique
+
     const updatedCabData = {
       ...cabData,
       uid: uid,
@@ -76,16 +111,12 @@ const ConfirmCab = () => {
       bookedTime: new Date().getTime(),
     };
 
-    const tripsRef = ref(db, "trips");
-    const newTripRef = push(tripsRef);
+    const tripsRef = ref(db, `trips/${tripID}`);
 
-    set(newTripRef, updatedCabData)
+    set(tripsRef, updatedCabData)
       .then(() => {
-        console.log("Trip data saved successfully with ID:", newTripRef.key);
-        const customerTripsRef = ref(
-          db,
-          `customers/${uid}/trips/${newTripRef.key}`
-        );
+        console.log("Trip data saved successfully with ID:", tripID);
+        const customerTripsRef = ref(db, `customers/${uid}/trips/${tripID}`);
 
         set(customerTripsRef, new Date().getTime())
           .then(() => {
