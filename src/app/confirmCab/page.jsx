@@ -106,12 +106,11 @@ const ConfirmCab = () => {
 
     const tripID = await getUniqueTripID(); // Ensure tripID is unique
 
-    cabData.totalCost = parseFloat(cabData.totalCost).toFixed(3);
-
     const updatedCabData = {
       ...cabData,
       uid: uid,
       status: 101,
+      totalCost: Number(parseFloat(cabData.totalCost).toFixed(2)),
       bookedTime: new Date().getTime(),
     };
 
