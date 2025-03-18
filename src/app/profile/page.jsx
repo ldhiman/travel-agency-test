@@ -65,6 +65,19 @@ const ProfilePage = () => {
     "Loading your profile..."
   );
 
+  const formatDateTime = (pickupDatetime) => {
+    const date = new Date(pickupDatetime);
+    const options = {
+      day: "2-digit", // DD (e.g., "18")
+      month: "short", // MMM (e.g., "Mar")
+      year: "numeric", // YYYY (e.g., "2025")
+      hour: "2-digit", // HH (e.g., "03")
+      minute: "2-digit", // MM (e.g., "30")
+      hour12: true, // A (e.g., "PM")
+    };
+    return date.toLocaleString("en-IN", options).replace(/,/, ", "); // e.g., "18 Mar 2025, 03:30 PM"
+  };
+
   const formatStatus = (id) => {
     switch (id) {
       case 100:
@@ -510,13 +523,12 @@ const ProfilePage = () => {
                       <p className="text-lg text-gray-700 mb-2 flex items-baseline">
                         <MapPin className="mr-2 h-5 w-5 text-red-600" />
                         <span className="font-semibold">
-                          $
                           {trip.tripType == "HOURLY RENTAL"
-                            ? "Duration:"
-                            : "To:"}
+                            ? "Duration: "
+                            : "To: "}
                         </span>{" "}
                         {trip.tripType == "HOURLY RENTAL"
-                          ? trip.hours
+                          ? `${trip.hours} hour`
                           : trip.destination}
                       </p>
                       <p className="text-lg mb-2 flex items-baseline">
@@ -536,12 +548,12 @@ const ProfilePage = () => {
                       <p className="text-lg text-gray-700 mb-2 flex items-baseline">
                         <Clock className="mr-2 h-5 w-5 text-blue-600" />
                         <span className="font-semibold">Pickup:</span>{" "}
-                        {new Date(trip.pickupDatetime).toLocaleString()}
+                        {formatDateTime(trip.pickupDatetime)}
                       </p>
                       <p className="text-lg text-gray-700 mb-4 flex items-baseline">
                         <Clock className="mr-2 h-5 w-5 text-purple-600" />
                         <span className="font-semibold">Booked:</span>{" "}
-                        {new Date(trip.bookedTime).toLocaleString()}
+                        {formatDateTime(trip.bookedTime)}
                       </p>
                     </div>
                   </div>

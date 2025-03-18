@@ -57,26 +57,41 @@ const ConfirmCab = () => {
     fetchCabData();
   }, [searchParams]);
 
-  const generateTripID = () => {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let tripID = "";
-    const length = Math.floor(Math.random() * 6) + 10; // Random length between 10-15
-
-    for (let i = 0; i < length; i++) {
-      // Length can be adjusted (10-15)
-      tripID += characters.charAt(
-        Math.floor(Math.random() * characters.length)
-      );
-    }
-    return tripID;
+  // Trip type prefixes
+  const TRIP_TYPE_PREFIXES = {
+    "ONE WAY": "OW",
+    "ROUND TRIP": "RT",
+    "HOURLY RENTAL": "HR",
   };
 
-  const getUniqueTripID = async () => {
+  // "ONE WAY", "ROUND TRIP", "HOURLY RENTAL"
+
+  const generateTripID = (tripType) => {
+    const prefix = TRIP_TYPE_PREFIXES[tripType.toUpperCase()];
+    if (!prefix) {
+      throw new Error(`Invalid trip type: ${tripType}`);
+    }
+
+    // Get current date in YYYYMMDD format
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const dateStr = `${year}${month}${day}`; // e.g., "20250318"
+    const randomStr = Array(4)
+      .fill(0)
+      .map(() => Math.floor(Math.random() * 36).toString(36))
+      .join("")
+      .toUpperCase();
+    return `${prefix}-${dateStr}-${randomStr}`; // e.g., "OW-1710734400-X7K9"
+  };
+
+  const getUniqueTripID = async (tripType) => {
     let tripID;
     let isUnique = false;
 
     while (!isUnique) {
-      tripID = generateTripID();
+      tripID = generateTripID(tripType.toUpperCase());
       const tripRef = ref(db, `trips/${tripID}`);
 
       try {
@@ -104,7 +119,7 @@ const ConfirmCab = () => {
 
     setLoading(true);
 
-    const tripID = await getUniqueTripID(); // Ensure tripID is unique
+    const tripID = await getUniqueTripID(cabData.tripType); // Ensure tripID is unique
 
     const updatedCabData = {
       ...cabData,
