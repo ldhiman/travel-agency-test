@@ -47,7 +47,7 @@ export default function ViewsSection() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-white to-blue-50 py-16">
+    <section className="bg-gradient-to-b from-white to-blue-50 py-16 px-10">
       <div className="container px-4 mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center text-custom-dark mb-12">
           Empowering Your Travel Experience

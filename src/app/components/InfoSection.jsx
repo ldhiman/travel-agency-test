@@ -11,7 +11,7 @@ const InfoCard = ({
   <div className="container mx-auto flex flex-col lg:flex-row items-center gap-12 py-16">
     {imageOnLeft ? (
       <>
-        <ImageSection image={image} />
+        <ImageSection image={image} fill />
         <ContentSection
           title={title}
           description={description}
@@ -57,7 +57,7 @@ const ContentSection = ({ title, description, buttonText }) => (
 
 export default function InfoSection() {
   return (
-    <section className="bg-gradient-to-b from-blue-50 to-white">
+    <section className="bg-gradient-to-b from-blue-50 to-white px-10">
       <InfoCard
         image="/Dzire.jpg"
         title="India's Premier Intercity and Local Cab Services"

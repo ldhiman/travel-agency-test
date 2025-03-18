@@ -24,11 +24,12 @@ const CabSelection = () => {
     fetchTripData();
   }, [searchParams]);
 
-  const handleVehicleSelection = (vehicleType, totalCost) => {
+  const handleVehicleSelection = (vehicleType, totalCost, includeToll) => {
     const bookingData = {
       ...tripData,
       vehicleType,
       totalCost,
+      includeToll,
       fare: tripData.distanceData.fares[vehicleType],
     };
 

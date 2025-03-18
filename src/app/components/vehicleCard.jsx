@@ -1,17 +1,20 @@
 import Image from "next/image";
-import { Users, Info } from "lucide-react";
 import {
-  Clock,
-  MapPin,
-  Calendar,
+  Users,
+  Info,
   TrendingUp,
-  CarTaxiFront,
+  MapPin,
   ArrowLeftRight,
+  Calendar,
+  CarTaxiFront,
+  Clock,
 } from "lucide-react";
+import { useState } from "react"; // Added useState import
 
 const vehicleImages = {
   sedan: "/sedan.png",
   suv: "/suv.png",
+  traveller12: "/traveller_1.png",
   traveller12_14: "/traveller_1.png",
   traveller16: "/traveller.png",
   dzire: "/dzire.png",
@@ -23,6 +26,7 @@ const vehicleImages = {
 const vehicleCapacity = {
   sedan: 4,
   suv: 6,
+  traveller12: 12,
   traveller12_14: 14,
   traveller16: 16,
   dzire: 4,
@@ -41,15 +45,30 @@ const VehicleCard = ({
 }) => {
   const imageSrc = vehicleImages[type.toLowerCase()] || vehicleImages.sedan;
   const capacity = vehicleCapacity[type.toLowerCase()] || 4;
+  const [includeToll, setIncludeToll] = useState(true); // State for toll inclusion
 
   const formatVehicleType = (type) => {
     if (type.toLowerCase() === "traveller12_14")
       return "Traveller 12-14 Seater";
+    if (type.toLowerCase() === "traveller12") return "Traveller 12 Seater";
     if (type.toLowerCase() === "traveller16") return "Traveller 16 Seater";
     return type
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(" ");
+  };
+
+  // Calculate adjusted total fare based on toll inclusion
+  const getAdjustedTotalFare = () => {
+    const tollCost =
+      fareDetails.tollTax && fareDetails.tollTax > 0 ? fareDetails.tollTax : 0;
+    return includeToll
+      ? fareDetails.totalFare
+      : fareDetails.totalFare - tollCost;
+  };
+
+  const handleSelect = () => {
+    onSelect(type, getAdjustedTotalFare(), includeToll); // Pass includeToll
   };
 
   // Create fare breakdown info string
@@ -68,9 +87,13 @@ const VehicleCard = ({
       note += "State Tax not included!!\n";
     }
     if (fareDetails.tollTax && fareDetails.tollTax > 0) {
-      items.push(`Toll Tax: ₹${fareDetails.tollTax.toFixed(2)}`);
+      if (includeToll) {
+        items.push(`Toll Tax: ₹${fareDetails.tollTax.toFixed(2)}`);
+      } else {
+        items.push(`Toll Tax: ₹0.00 (Excluded)`);
+      }
     } else {
-      note += "Toll Tax not included!!\n";
+      note += "Toll Tax not applicable!!\n";
     }
     if (fareDetails.nightDrop && fareDetails.nightDrop > 0)
       items.push(`Night Drop: ₹${fareDetails.nightDrop.toFixed(2)}`);
@@ -104,7 +127,7 @@ const VehicleCard = ({
                 {formatVehicleType(type)}
               </h3>
               <p className="text-3xl font-semibold text-indigo-600">
-                ₹{fareDetails.totalFare.toFixed(2)}
+                ₹{getAdjustedTotalFare().toFixed(2)}
               </p>
             </div>
             <div className="flex space-x-4 text-sm text-gray-600 mb-4">
@@ -125,10 +148,27 @@ const VehicleCard = ({
               <p className="text-sm text-gray-600 whitespace-pre-line">
                 {getFareBreakdown()}
               </p>
+              {fareDetails.tollTax > 0 && (
+                <div className="mt-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`toll-${type}`}
+                    checked={includeToll}
+                    onChange={(e) => setIncludeToll(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label
+                    htmlFor={`toll-${type}`}
+                    className="text-sm text-gray-700"
+                  >
+                    Include Toll Tax (₹{fareDetails.tollTax.toFixed(2)})
+                  </label>
+                </div>
+              )}
             </div>
           </div>
           <button
-            onClick={() => onSelect(type, fareDetails.totalFare)}
+            onClick={handleSelect}
             className="w-full bg-indigo-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-indigo-600 transition-colors duration-300"
           >
             Select This Vehicle
@@ -139,9 +179,10 @@ const VehicleCard = ({
   );
 };
 
+// TripDetailsCard remains unchanged
 const TripDetailsCard = ({ tripData }) => {
   const formatDateTime = (timestamp) => {
-    return new Date(timestamp).toLocaleString("en-US", {
+    return new Date(timestamp).toLocaleString("en-IN", {
       dateStyle: "medium",
       timeStyle: "short",
     });

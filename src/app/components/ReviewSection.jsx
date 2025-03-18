@@ -39,7 +39,6 @@ const FeatureCard = ({ image, title, description, link }) => (
 );
 
 export default function ReviewSection() {
-  
   const features = [
     {
       image: "/hill.jpg",
@@ -65,7 +64,7 @@ export default function ReviewSection() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-blue-50 to-white py-16">
+    <section className="bg-gradient-to-b from-blue-50 to-white py-16 px-10">
       <div className="container px-4 mx-auto">
         <h2 className="text-3xl md:text-4xl font-bold text-center text-custom-dark mb-12">
           Explore Our Services

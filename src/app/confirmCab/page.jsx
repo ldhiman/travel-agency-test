@@ -111,6 +111,17 @@ const ConfirmCab = () => {
       uid: uid,
       status: 101,
       totalCost: Number(parseFloat(cabData.totalCost).toFixed(2)),
+      fare: {
+        ...cabData.fare,
+        baseFare: cabData.fare.baseFare
+          ? Number(parseFloat(cabData.fare.baseFare).toFixed(2))
+          : -1,
+        gst: cabData.fare.gst
+          ? Number(parseFloat(cabData.fare.gst).toFixed(2))
+          : -1,
+        tollTax: cabData.includeToll ? cabData.fare.tollTax : -1,
+        totalFare: Number(parseFloat(cabData.totalCost).toFixed(2)),
+      },
       bookedTime: new Date().getTime(),
     };
 
