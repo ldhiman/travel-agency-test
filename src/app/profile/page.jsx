@@ -362,392 +362,412 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-blue-600 mb-4">Welcome!</h2>
-          <p className="text-lg font-medium text-gray-700 mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+          <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-800 text-center">
             {progressMessage}
-          </p>
-          <div className="relative pt-1">
-            <div className="flex mb-2 items-center justify-between">
-              <span className="text-xs font-semibold inline-block py-1 px-2 rounded-full text-blue-600 bg-blue-200">
-                {progress}%
-              </span>
-            </div>
-            <div className="flex-auto border-2 rounded-xl bg-gray-200">
-              <div
-                className="progress-bar h-2 rounded-xl bg-blue-500 transition-all duration-300 ease-out"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
+          </h2>
+          <div className="mt-4 bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-indigo-600 h-full transition-all duration-500 ease-in-out"
+              style={{ width: `${progress}%` }}
+            />
           </div>
+          <p className="text-sm text-gray-500 text-center mt-2">
+            {progress}% Complete
+          </p>
         </div>
       </div>
     );
   }
 
-  if (error)
+  if (error) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-red-50 to-red-100">
-        <div className="bg-white p-8 rounded-xl shadow-lg">
-          <p className="text-red-600 text-lg font-semibold">{error}</p>
-          <p className="mt-4 text-gray-600">
+      <div className="min-h-screen flex items-center justify-center bg-red-50 p-4">
+        <div className="bg-white p-6 rounded-2xl shadow-xl max-w-md w-full">
+          <AlertCircle className="w-10 h-10 text-red-600 mx-auto mb-4" />
+          <p className="text-lg font-semibold text-red-700 text-center">
+            {error}
+          </p>
+          <p className="mt-2 text-gray-600 text-center">
             Please try again later or contact support.
           </p>
         </div>
       </div>
     );
+  }
 
-  if (!customer)
+  if (!customer) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-gray-100 to-gray-200">
-        <div className="bg-white p-8 rounded-xl shadow-lg">
-          <p className="text-lg font-semibold text-gray-600">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white p-6 rounded-2xl shadow-xl max-w-md w-full">
+          <User className="w-10 h-10 text-gray-500 mx-auto mb-4" />
+          <p className="text-lg font-semibold text-gray-700 text-center">
             No customer data available
           </p>
-          <p className="mt-4 text-gray-600">
+          <p className="mt-2 text-gray-600 text-center">
             Please log in to view your profile.
           </p>
         </div>
       </div>
     );
+  }
 
   return (
-    <div className="p-8 w-auto md:mx-auto max-w-4xl bg-white shadow-lg rounded-xl border border-gray-300">
-      <div className="mb-8">
-        <h2 className="text-4xl font-extrabold text-blue-900 mb-6 flex items-center">
-          <User className="mr-2 h-8 w-8" /> Welcome, {customer.name}!
-        </h2>
-        <div className="space-y-4 bg-blue-50 p-6 rounded-lg">
-          <p className="text-lg text-gray-700 flex items-center">
-            <Mail className="mr-2 h-5 w-5 text-blue-600" />
-            <span className="font-semibold">Email:</span> {customer.email}
-          </p>
-          <p className="text-lg text-gray-700 flex items-center">
-            <Phone className="mr-2 h-5 w-5 text-blue-600" />
-            <span className="font-semibold">Phone:</span> {customer.phone}
-          </p>
-          <p className="text-lg text-gray-700 flex items-center">
-            <Calendar className="mr-2 h-5 w-5 text-blue-600" />
-            <span className="font-semibold">Date of Birth:</span> {customer.dob}
-          </p>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <h3 className="text-2xl font-bold text-blue-800 mb-4">
-          Trip Statistics
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-blue-100 p-4 rounded-lg">
-            <p className="text-lg font-semibold">Total Trips</p>
-            <p className="text-3xl font-bold text-blue-600">
-              {statistics.totalTrips}
-            </p>
-          </div>
-          <div className="bg-green-100 p-4 rounded-lg">
-            <p className="text-lg font-semibold">Average Cost</p>
-            <p className="text-3xl font-bold text-green-600">
-              ₹{statistics.averageCost}
-            </p>
-          </div>
-          <div className="bg-purple-100 p-4 rounded-lg">
-            <p className="text-lg font-semibold">Total Spent</p>
-            <p className="text-3xl font-bold text-purple-600">
-              ₹{statistics.totalSpent}
-            </p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+        {/* Profile Header */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 flex items-center">
+            <User className="w-8 h-8 text-indigo-600 mr-3" />
+            Welcome, {customer.name}!
+          </h2>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-indigo-50 p-6 rounded-xl">
+            <div className="flex items-center space-x-3">
+              <Mail className="w-5 h-5 text-indigo-600" />
+              <div>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="text-base font-medium text-gray-800">
+                  {customer.email}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Phone className="w-5 h-5 text-indigo-600" />
+              <div>
+                <p className="text-sm text-gray-500">Phone</p>
+                <p className="text-base font-medium text-gray-800">
+                  {customer.phone}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Calendar className="w-5 h-5 text-indigo-600" />
+              <div>
+                <p className="text-sm text-gray-500">Date of Birth</p>
+                <p className="text-base font-medium text-gray-800">
+                  {customer.dob}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <h2 className="text-3xl font-bold text-blue-900 mb-6 flex items-center">
-          <MapPin className="mr-2 h-7 w-7" /> Your Trips
-        </h2>
-
-        <div className="mb-4 flex flex-wrap items-center gap-4">
-          <div className="flex items-center">
-            <Filter className="mr-2 h-5 w-5 text-gray-600" />
-            <select
-              value={filterStatus}
-              onChange={(e) => handleFilter(e.target.value)}
-              className="border rounded-md px-2 py-1"
-            >
-              <option value="all">All Statuses</option>
-              <option value="101">Booked</option>
-              <option value="102">Confirmed</option>
-              <option value="103">Picked Up</option>
-              <option value="104">Dropped</option>
-              <option value="105">Completed</option>
-              <option value="201, 202, 203">Cancelled</option>
-            </select>
-          </div>
-          <button
-            onClick={handleSort}
-            className="flex items-center border rounded-md px-3 py-1 hover:bg-gray-100"
-          >
-            {sortOrder === "asc" ? (
-              <SortAsc className="mr-2 h-5 w-5 text-gray-600" />
-            ) : (
-              <SortDesc className="mr-2 h-5 w-5 text-gray-600" />
-            )}
-            Sort by Date
-          </button>
-        </div>
-
-        {filteredTrips.length > 0 ? (
-          <ul className="space-y-6">
-            {filteredTrips.map((trip, index) => {
-              const {
-                text,
-                color,
-                canCancel,
-                canFetchDetails,
-                canLeaveFeedback,
-              } = formatStatus(trip.status);
-              return (
-                <li
-                  key={index}
-                  className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-                >
-                  <h3 className="text-2xl font-semibold text-blue-800 mb-3 flex items-baseline">
-                    <MapPin className="mr-2 h-6 w-6" /> Trip ID: {trip.Id}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-lg text-gray-700 mb-2 flex items-baseline">
-                        <MapPin className="mr-2 h-5 w-5 text-green-600" />
-                        <span className="font-semibold">From:</span>{" "}
-                        {trip.source}
-                      </p>
-                      <p className="text-lg text-gray-700 mb-2 flex items-baseline">
-                        <MapPin className="mr-2 h-5 w-5 text-red-600" />
-                        <span className="font-semibold">
-                          {trip.tripType == "HOURLY RENTAL"
-                            ? "Duration: "
-                            : "To: "}
-                        </span>{" "}
-                        {trip.tripType == "HOURLY RENTAL"
-                          ? `${trip.hours} hour`
-                          : trip.destination}
-                      </p>
-                      <p className="text-lg mb-2 flex items-baseline">
-                        <AlertCircle className="mr-2 h-5 w-5 text-blue-600" />
-                        <span className="font-semibold">Status:</span>{" "}
-                        <span className={`font-semibold ${color} ml-1`}>
-                          {text}
-                        </span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-lg text-gray-700 mb-2 flex items-baseline">
-                        <DollarSign className="mr-2 h-5 w-5 text-green-600" />
-                        <span className="font-semibold">Cost:</span> Rs.{" "}
-                        {parseFloat(trip.totalCost).toFixed(2)}
-                      </p>
-                      <p className="text-lg text-gray-700 mb-2 flex items-baseline">
-                        <Clock className="mr-2 h-5 w-5 text-blue-600" />
-                        <span className="font-semibold">Pickup:</span>{" "}
-                        {formatDateTime(trip.pickupDatetime)}
-                      </p>
-                      <p className="text-lg text-gray-700 mb-4 flex items-baseline">
-                        <Clock className="mr-2 h-5 w-5 text-purple-600" />
-                        <span className="font-semibold">Booked:</span>{" "}
-                        {formatDateTime(trip.bookedTime)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-4 mt-4">
-                    {trip.status === 100 && (
-                      <button
-                        onClick={() => handleAdvanceFee(trip)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center"
-                      >
-                        <BadgeIndianRupee className="mr-2 h-5 w-5" /> Pay &
-                        Confirm Trip
-                      </button>
-                    )}
-                    {canCancel && (
-                      <button
-                        onClick={() => openConfirmDialog(trip.Id)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 flex items-center"
-                      >
-                        <X className="mr-2 h-5 w-5" /> Cancel Trip
-                      </button>
-                    )}
-                    {canFetchDetails && (
-                      <button
-                        onClick={() => handleFetchDetails(trip)}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center"
-                      >
-                        <User className="mr-2 h-5 w-5" /> View Details
-                      </button>
-                    )}
-                    {canLeaveFeedback && (
-                      <button
-                        onClick={() => openFeedbackModal(trip)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300 flex items-center"
-                      >
-                        <Star className="mr-2 h-5 w-5" /> Leave Feedback
-                      </button>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-xl text-gray-600 mb-4">
-              No trips found matching the current filter.
-            </p>
-            <p className="text-lg text-blue-600">
-              Try changing the filter or book a new trip!
-            </p>
-          </div>
-        )}
-      </div>
-
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <div className="relative p-6">
-          <h3 className="text-2xl font-semibold text-blue-800 mb-4 flex items-center">
-            <MapPin className="mr-2 h-6 w-6" /> Trip ID: {selectedTripId}
+        {/* Statistics */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+            Trip Statistics
           </h3>
-          {driverDetails && (
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-800 mb-2 flex items-center">
-                <User className="mr-2 h-5 w-5" /> Your Driver
-              </h4>
-              <div className="flex items-center space-x-4 bg-blue-50 p-4 rounded-lg">
-                <img
-                  loading="lazy"
-                  src={driverDetails.profile_picture}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://avatars.githubusercontent.com/u/26671790?v=4";
-                  }}
-                  alt="Driver"
-                  className="w-20 h-20 object-cover rounded-full ring-2 ring-blue-500"
-                />
-                <div>
-                  <p className="text-lg text-gray-700 flex items-center">
-                    <User className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="font-semibold">Name:</span>{" "}
-                    {driverDetails.name}
-                  </p>
-                  <p className="text-lg text-gray-700 flex items-center">
-                    <Phone className="mr-2 h-5 w-5 text-blue-600" />
-                    <span className="font-semibold">Phone:</span>{" "}
-                    {driverDetails.phone}
-                  </p>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-indigo-100 p-4 rounded-xl shadow-sm">
+              <p className="text-sm text-gray-600">Total Trips</p>
+              <p className="text-2xl font-bold text-indigo-700">
+                {statistics.totalTrips}
+              </p>
+            </div>
+            <div className="bg-green-100 p-4 rounded-xl shadow-sm">
+              <p className="text-sm text-gray-600">Average Cost</p>
+              <p className="text-2xl font-bold text-green-700">
+                ₹{statistics.averageCost}
+              </p>
+            </div>
+            <div className="bg-purple-100 p-4 rounded-xl shadow-sm">
+              <p className="text-sm text-gray-600">Total Spent</p>
+              <p className="text-2xl font-bold text-purple-700">
+                ₹{statistics.totalSpent}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Trips Section */}
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
+            <MapPin className="w-6 h-6 text-indigo-600 mr-2" /> Your Trips
+          </h2>
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <Filter className="w-5 h-5 text-gray-600" />
+              <select
+                value={filterStatus}
+                onChange={(e) => handleFilter(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="all">All Statuses</option>
+                <option value="101">Booked</option>
+                <option value="102">Confirmed</option>
+                <option value="103">Picked Up</option>
+                <option value="104">Dropped</option>
+                <option value="105">Completed</option>
+                <option value="201, 202, 203">Cancelled</option>
+              </select>
+            </div>
+            <button
+              onClick={handleSort}
+              className="flex items-center space-x-2 border rounded-lg px-3 py-2 text-sm hover:bg-gray-100 transition"
+            >
+              {sortOrder === "asc" ? (
+                <SortAsc className="w-5 h-5" />
+              ) : (
+                <SortDesc className="w-5 h-5" />
+              )}
+              <span>Sort by Date</span>
+            </button>
+          </div>
+
+          {filteredTrips.length > 0 ? (
+            <ul className="space-y-6">
+              {filteredTrips.map((trip, index) => {
+                const {
+                  text,
+                  color,
+                  canCancel,
+                  canFetchDetails,
+                  canLeaveFeedback,
+                } = formatStatus(trip.status);
+                return (
+                  <li
+                    key={index}
+                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
+                  >
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                        <MapPin className="w-5 h-5 text-indigo-600 mr-2" /> Trip
+                        ID: {trip.Id}
+                      </h3>
+                      <span className={`text-sm font-medium ${color}`}>
+                        {text}
+                      </span>
+                    </div>
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600 flex items-center">
+                          <MapPin className="w-4 h-4 text-green-600 mr-2" />{" "}
+                          <strong>From:</strong>&nbsp; {trip.source}
+                        </p>
+                        <p className="text-sm text-gray-600 flex items-center">
+                          <MapPin className="w-4 h-4 text-red-600 mr-2" />{" "}
+                          <strong>
+                            {trip.tripType === "HOURLY RENTAL"
+                              ? "Duration:"
+                              : "To:"}
+                          </strong>
+                          &nbsp;
+                          {trip.tripType === "HOURLY RENTAL"
+                            ? `${trip.hours} hour`
+                            : trip.destination}
+                        </p>
+                        <p className="text-sm text-gray-600 flex items-center">
+                          <Clock className="w-4 h-4 text-blue-600 mr-2" />{" "}
+                          <strong>Pickup:</strong>&nbsp;
+                          {formatDateTime(trip.pickupDatetime)}
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600 flex items-center">
+                          <DollarSign className="w-4 h-4 text-green-600 mr-2" />{" "}
+                          <strong>Cost:</strong>&nbsp;₹
+                          {parseFloat(trip.totalCost).toFixed(2)}
+                        </p>
+                        <p className="text-sm text-gray-600 flex items-center">
+                          <Clock className="w-4 h-4 text-purple-600 mr-2" />{" "}
+                          <strong>Booked:</strong>&nbsp;
+                          {formatDateTime(trip.bookedTime)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {trip.status === 100 && (
+                        <button
+                          onClick={() => handleAdvanceFee(trip)}
+                          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                        >
+                          <BadgeIndianRupee className="w-4 h-4 mr-2" /> Pay &
+                          Confirm
+                        </button>
+                      )}
+                      {canCancel && (
+                        <button
+                          onClick={() => openConfirmDialog(trip.Id)}
+                          className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                        >
+                          <X className="w-4 h-4 mr-2" /> Cancel
+                        </button>
+                      )}
+                      {canFetchDetails && (
+                        <button
+                          onClick={() => handleFetchDetails(trip)}
+                          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        >
+                          <User className="w-4 h-4 mr-2" /> Details
+                        </button>
+                      )}
+                      {canLeaveFeedback && (
+                        <button
+                          onClick={() => openFeedbackModal(trip)}
+                          className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                        >
+                          <Star className="w-4 h-4 mr-2" /> Feedback
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div className="text-center py-12 bg-gray-100 rounded-xl">
+              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-lg text-gray-600">No trips found.</p>
+              <p className="text-sm text-indigo-600 mt-2">
+                Try adjusting the filters or book a new trip!
+              </p>
             </div>
           )}
-          {vehicleDetails && (
-            <div>
-              <h4 className="text-xl font-semibold text-gray-800 mb-2 flex items-center">
-                <MapPin className="mr-2 h-5 w-5" /> Vehicle Information
-              </h4>
-              <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-                <p className="text-lg text-gray-700 flex items-center">
-                  <span className="font-semibold">Vehicle:</span>{" "}
-                  {vehicleDetails.vehicleMake} {vehicleDetails.vehicleModel}
-                </p>
-                <p className="text-lg text-gray-700 flex items-center">
-                  <span className="font-semibold">Color:</span>{" "}
-                  {vehicleDetails.vehicleColor}
-                </p>
-                <p className="text-lg text-gray-700 flex items-center">
-                  <span className="font-semibold">License Plate:</span>{" "}
-                  {vehicleDetails.vehicleNumber}
-                </p>
-                <div className="flex space-x-4 mt-4">
-                  {vehicleDetails.VEHICLE_FRONT && (
-                    <img
-                      loading="lazy"
-                      src={vehicleDetails.VEHICLE_FRONT}
-                      alt="Front View"
-                      className="w-32 h-32 object-cover rounded-md border border-gray-300"
-                    />
-                  )}
-                  {vehicleDetails.VEHICLE_BACK && (
-                    <img
-                      loading="lazy"
-                      src={vehicleDetails.VEHICLE_BACK}
-                      alt="Back View"
-                      className="w-32 h-32 object-cover rounded-md border border-gray-300"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+        </div>
+
+        {/* Trip Details Modal */}
+        <Modal isOpen={isModalOpen} onClose={closeModal}>
           <button
             onClick={closeModal}
-            className="absolute top-2 right-2 p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors duration-300"
-            aria-label="Close modal"
+            className="top-4 right-4 p-1 bg-gray-200 rounded-full hover:bg-gray-300 transition"
           >
-            <X className="w-6 h-6 text-gray-600" />
+            <X className="w-5 h-5 text-gray-600" />
           </button>
-        </div>
-      </Modal>
+          <div className="p-6 bg-white rounded-xl shadow-lg">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+              <MapPin className="w-5 h-5 text-indigo-600 mr-2" /> Trip ID:{" "}
+              {selectedTripId}
+            </h3>
+            {driverDetails.name && (
+              <div className="mb-6">
+                <h4 className="text-lg font-medium text-gray-700 mb-2">
+                  Driver Details
+                </h4>
+                <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+                  <img
+                    src={
+                      driverDetails.profile_picture ||
+                      "https://via.placeholder.com/80"
+                    }
+                    alt="Driver"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
+                  />
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      <strong>Name:</strong> {driverDetails.name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>Phone:</strong> {driverDetails.phone}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            {vehicleDetails.vehicleMake && (
+              <div>
+                <h4 className="text-lg font-medium text-gray-700 mb-2">
+                  Vehicle Details
+                </h4>
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <strong>Vehicle:</strong> {vehicleDetails.vehicleMake}{" "}
+                    {vehicleDetails.vehicleModel}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Color:</strong> {vehicleDetails.vehicleColor}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>License Plate:</strong>{" "}
+                    {vehicleDetails.vehicleNumber}
+                  </p>
+                  <div className="flex gap-4 mt-2">
+                    {vehicleDetails.VEHICLE_FRONT && (
+                      <img
+                        src={vehicleDetails.VEHICLE_FRONT}
+                        alt="Front"
+                        className="w-24 h-24 rounded-md object-cover"
+                      />
+                    )}
+                    {vehicleDetails.VEHICLE_BACK && (
+                      <img
+                        src={vehicleDetails.VEHICLE_BACK}
+                        alt="Back"
+                        className="w-24 h-24 rounded-md object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </Modal>
 
-      <Modal isOpen={isFeedbackModalOpen} onClose={closeFeedbackModal}>
-        <div className="p-6">
-          <h3 className="text-2xl font-semibold text-blue-800 mb-4">
-            Leave Feedback
-          </h3>
-          <p className="mb-4">Trip ID: {tripForFeedback?.Id}</p>
-          <div className="mb-4">
-            <p className="mb-2">Rating:</p>
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`h-8 w-8 cursor-pointer ${
-                    star <= feedback.rating
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                  onClick={() =>
-                    setFeedback({ ...feedback, rating: star, customerID: uid })
-                  }
-                />
-              ))}
+        {/* Feedback Modal */}
+        <Modal isOpen={isFeedbackModalOpen} onClose={closeFeedbackModal}>
+          <div className="p-6 bg-white rounded-xl shadow-lg">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Leave Feedback
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Trip ID: {tripForFeedback?.Id}
+            </p>
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">Rating</p>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-6 h-6 cursor-pointer ${
+                      star <= feedback.rating
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
+                    }`}
+                    onClick={() =>
+                      setFeedback({
+                        ...feedback,
+                        rating: star,
+                        customerID: uid,
+                      })
+                    }
+                  />
+                ))}
+              </div>
             </div>
+            <div className="mb-4">
+              <label
+                htmlFor="comment"
+                className="block text-sm text-gray-600 mb-2"
+              >
+                Comment
+              </label>
+              <textarea
+                id="comment"
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                rows="3"
+                value={feedback.comment}
+                onChange={(e) =>
+                  setFeedback({ ...feedback, comment: e.target.value })
+                }
+              />
+            </div>
+            <button
+              onClick={handleFeedbackSubmit}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            >
+              Submit Feedback
+            </button>
           </div>
-          <div className="mb-4">
-            <label htmlFor="comment" className="block mb-2">
-              Comment:
-            </label>
-            <textarea
-              id="comment"
-              className="w-full p-2 border rounded"
-              rows="4"
-              value={feedback.comment}
-              onChange={(e) =>
-                setFeedback({ ...feedback, comment: e.target.value })
-              }
-            ></textarea>
-          </div>
-          <button
-            onClick={handleFeedbackSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
-          >
-            Submit Feedback
-          </button>
-        </div>
-      </Modal>
+        </Modal>
 
-      <ConfirmationDialog
-        isOpen={isConfirmDialogOpen}
-        onClose={closeConfirmDialog}
-        onConfirm={handleCancel}
-        message={`Are you sure you want to cancel Trip ${tripToCancel}? This action cannot be undone.`}
-      />
+        <ConfirmationDialog
+          isOpen={isConfirmDialogOpen}
+          onClose={closeConfirmDialog}
+          onConfirm={handleCancel}
+          message={`Are you sure you want to cancel Trip ${tripToCancel}? This action cannot be undone.`}
+        />
+      </div>
     </div>
   );
 };
