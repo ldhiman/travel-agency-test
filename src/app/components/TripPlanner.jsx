@@ -348,17 +348,17 @@ const TripPlanner = () => {
 
   return (
     <div className="max-w-5xl mx-auto mt-8 px-4 pb-16">
-      <div className="flex flex-col items-center mb-8">
-        <h1 className="text-4xl font-bold text-center mb-2 text-blue-600">
-          Plan Your Perfect Trip
+      <div className="text-center lg:text-left">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 leading-tight">
+          Discover the <span className="text-pink-600">Magic</span> of India
         </h1>
-        <p className="text-gray-600 text-center max-w-2xl">
-          Enter your travel details below and we will find the best cab options
-          for your journey
+        <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto lg:mx-0">
+          Plan your perfect journey through incredible destinations with our
+          personalized trip planner.
         </p>
       </div>
 
-      <div className="bg-white shadow-xl rounded-xl p-8 mb-8 border border-gray-100">
+      <div className="bg-white shadow-xl rounded-xl p-8 my-4 border border-gray-100">
         {/* Trip Type Selection */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold mb-4 text-gray-700">

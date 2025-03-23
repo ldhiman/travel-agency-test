@@ -229,7 +229,7 @@ const ConfirmCab = () => {
               <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
               <p className="mt-4 text-gray-600">Confirming your booking...</p>
               <p className="text-sm text-gray-500 mt-2">
-                Please don't close this window
+                Please don&apos;t close this window
               </p>
             </div>
           ) : cabData ? (
@@ -476,7 +476,7 @@ const ConfirmCab = () => {
                   No trip data available
                 </p>
                 <p className="text-gray-600 mb-4">
-                  We couldn't find the details for your booking. Please try
+                  We couldn&apos;t find the details for your booking. Please try
                   booking again.
                 </p>
                 <button
