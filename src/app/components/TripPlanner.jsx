@@ -353,7 +353,7 @@ const TripPlanner = () => {
           Plan Your Perfect Trip
         </h1>
         <p className="text-gray-600 text-center max-w-2xl">
-          Enter your travel details below and we'll find the best cab options
+          Enter your travel details below and we will find the best cab options
           for your journey
         </p>
       </div>
