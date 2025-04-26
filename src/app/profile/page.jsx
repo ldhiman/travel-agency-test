@@ -11,6 +11,7 @@ import {
   saveTripFeedback,
   checkExistingFeedback,
 } from "./function";
+import TripCard from "../components/TripCard";
 import Modal from "../components/Modal";
 import ConfirmationDialog from "../components/confirmCancellation";
 import toast from "react-hot-toast";
@@ -19,6 +20,8 @@ import {
   X,
   User,
   Mail,
+  UserCircle,
+  Car,
   Phone,
   Calendar,
   MapPin,
@@ -64,112 +67,6 @@ const ProfilePage = () => {
   const [progressMessage, setProgressMessage] = useState(
     "Loading your profile..."
   );
-
-  const formatDateTime = (pickupDatetime) => {
-    const date = new Date(pickupDatetime);
-    const options = {
-      day: "2-digit", // DD (e.g., "18")
-      month: "short", // MMM (e.g., "Mar")
-      year: "numeric", // YYYY (e.g., "2025")
-      hour: "2-digit", // HH (e.g., "03")
-      minute: "2-digit", // MM (e.g., "30")
-      hour12: true, // A (e.g., "PM")
-    };
-    return date.toLocaleString("en-IN", options).replace(/,/, ", "); // e.g., "18 Mar 2025, 03:30 PM"
-  };
-
-  const formatStatus = (id) => {
-    switch (id) {
-      case 100:
-        return {
-          text: "Pay Trip Confirmation Fee",
-          color: "text-blue-600",
-          canCancel: true,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-      case 101:
-        return {
-          text: "Booked",
-          color: "text-yellow-600",
-          canCancel: true,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-      case 102:
-        return {
-          text: "Confirmed",
-          color: "text-green-600",
-          canCancel: true,
-          canFetchDetails: true,
-          canLeaveFeedback: false,
-        };
-      case 103:
-        return {
-          text: "Picked Up",
-          color: "text-blue-600",
-          canCancel: false,
-          canFetchDetails: true,
-          canLeaveFeedback: false,
-        };
-      case 104:
-        return {
-          text: "Dropped",
-          color: "text-purple-600",
-          canCancel: false,
-          canFetchDetails: true,
-          canLeaveFeedback: false,
-        };
-      case 105:
-        return {
-          text: "Completed",
-          color: "text-purple-700",
-          canCancel: false,
-          canFetchDetails: true,
-          canLeaveFeedback: true,
-        };
-      case 201:
-        return {
-          text: "Cancelled",
-          color: "text-red-600",
-          canCancel: false,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-      case 202:
-        return {
-          text: "Cancelled (No Vendor Interested)",
-          color: "text-red-500",
-          canCancel: false,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-      case 203:
-        return {
-          text: "Cancelled By Vendor",
-          color: "text-red-700",
-          canCancel: false,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-      case 204:
-        return {
-          text: "Cancelled - Confirmation Fee not Paid",
-          color: "text-red-700",
-          canCancel: false,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-      default:
-        return {
-          text: `Unknown Status (${id})`,
-          color: "text-gray-600",
-          canCancel: false,
-          canFetchDetails: false,
-          canLeaveFeedback: false,
-        };
-    }
-  };
 
   const handleCancel = async () => {
     try {
@@ -322,7 +219,7 @@ const ProfilePage = () => {
           setCustomer(customerDetails);
 
           setProgress(50);
-          setProgressMessage("Loading trip information...");
+          setProgressMessage("Loading trip history...");
           const tripIds = await getCustomerTripIds(user.uid);
           const tripDetails = await Promise.all(tripIds.map(getTripDetails));
           tripDetails.sort(
@@ -362,19 +259,22 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
-          <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 text-center">
-            {progressMessage}
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md transform transition hover:scale-105">
+          <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mx-auto mb-6" />
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
+            Profile Loading
           </h2>
-          <div className="mt-4 bg-gray-200 rounded-full h-2 overflow-hidden">
+          <h3 className="text-lg text-gray-600 text-center mb-6">
+            {progressMessage}
+          </h3>
+          <div className="bg-gray-200 rounded-full h-3 overflow-hidden">
             <div
-              className="bg-indigo-600 h-full transition-all duration-500 ease-in-out"
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full transition-all duration-700 ease-in-out"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-sm text-gray-500 text-center mt-2">
+          <p className="text-sm text-gray-500 text-center mt-4">
             {progress}% Complete
           </p>
         </div>
@@ -419,10 +319,19 @@ const ProfilePage = () => {
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6">
         {/* Profile Header */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 flex items-center">
-            <User className="w-8 h-8 text-indigo-600 mr-3" />
-            Welcome, {customer.name}!
-          </h2>
+          <div className="mb-8 flex items-center space-x-6">
+            <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
+              <User className="w-12 h-12 text-indigo-600" />
+            </div>
+            <div>
+              <h2 className="text-4xl font-bold text-gray-900">
+                Welcome, {customer.name}
+              </h2>
+              <p className="text-lg text-gray-600">
+                Manage your trips and profile
+              </p>
+            </div>
+          </div>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-indigo-50 p-6 rounded-xl">
             <div className="flex items-center space-x-3">
               <Mail className="w-5 h-5 text-indigo-600" />
@@ -486,39 +395,47 @@ const ProfilePage = () => {
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center">
             <MapPin className="w-6 h-6 text-indigo-600 mr-2" /> Your Trips
           </h2>
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-600" />
-              <select
-                value={filterStatus}
-                onChange={(e) => handleFilter(e.target.value)}
-                className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => handleFilter(e.target.value)}
+                  className="pl-10 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="101">Booked</option>
+                  <option value="102">Confirmed</option>
+                  <option value="103">Picked Up</option>
+                  <option value="104">Dropped</option>
+                  <option value="105">Completed</option>
+                  <option value="201, 202, 203">Cancelled</option>
+                </select>
+              </div>
+              <button
+                onClick={handleSort}
+                className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition"
               >
-                <option value="all">All Statuses</option>
-                <option value="101">Booked</option>
-                <option value="102">Confirmed</option>
-                <option value="103">Picked Up</option>
-                <option value="104">Dropped</option>
-                <option value="105">Completed</option>
-                <option value="201, 202, 203">Cancelled</option>
-              </select>
+                {sortOrder === "asc" ? <SortAsc /> : <SortDesc />}
+                <span>Sort by Date</span>
+              </button>
             </div>
-            <button
-              onClick={handleSort}
-              className="flex items-center space-x-2 border rounded-lg px-3 py-2 text-sm hover:bg-gray-100 transition"
-            >
-              {sortOrder === "asc" ? (
-                <SortAsc className="w-5 h-5" />
-              ) : (
-                <SortDesc className="w-5 h-5" />
-              )}
-              <span>Sort by Date</span>
-            </button>
           </div>
 
           {filteredTrips.length > 0 ? (
             <ul className="space-y-6">
-              {filteredTrips.map((trip, index) => {
+              {filteredTrips.map((trip) => (
+                <TripCard
+                  key={trip.Id}
+                  trip={trip}
+                  onCancel={openConfirmDialog}
+                  onDetails={handleFetchDetails}
+                  onAdvanceFee={handleAdvanceFee}
+                  onFeedback={openFeedbackModal}
+                />
+              ))}
+              {/* {filteredTrips.map((trip, index) => {
                 const {
                   text,
                   color,
@@ -529,7 +446,8 @@ const ProfilePage = () => {
                 return (
                   <li
                     key={index}
-                    className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition"
+                    className="bg-white p-6 rounded-2xl shadow-md hover:border-red-500 hover:cursor-default
+ transition-all duration-300 transform border-l-4 border-indigo-500"
                   >
                     <div className="flex justify-between items-start">
                       <h3 className="text-xl font-semibold text-gray-800 flex items-center">
@@ -614,7 +532,7 @@ const ProfilePage = () => {
                     </div>
                   </li>
                 );
-              })}
+              })} */}
             </ul>
           ) : (
             <div className="text-center py-12 bg-gray-100 rounded-xl">
@@ -629,135 +547,158 @@ const ProfilePage = () => {
 
         {/* Trip Details Modal */}
         <Modal isOpen={isModalOpen} onClose={closeModal}>
-          <button
-            onClick={closeModal}
-            className="top-4 right-4 p-1 bg-gray-200 rounded-full hover:bg-gray-300 transition"
-          >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
-          <div className="p-6 bg-white rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-              <MapPin className="w-5 h-5 text-indigo-600 mr-2" /> Trip ID:{" "}
-              {selectedTripId}
-            </h3>
-            {driverDetails.name && (
-              <div className="mb-6">
-                <h4 className="text-lg font-medium text-gray-700 mb-2">
-                  Driver Details
-                </h4>
-                <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
-                  <img
-                    src={
-                      driverDetails.profile_picture ||
-                      "https://via.placeholder.com/80"
-                    }
-                    alt="Driver"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
-                  />
-                  <div>
-                    <p className="text-sm text-gray-600">
-                      <strong>Name:</strong> {driverDetails.name}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      <strong>Phone:</strong> {driverDetails.phone}
-                    </p>
-                  </div>
-                </div>
+          <div className="relative p-6">
+            <div className="flex justify-between items-center border-b pb-4 mb-4">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                <MapPin className="w-5 h-5 text-indigo-600 mr-2" />
+                Trip Details
+              </h3>
+              <button
+                onClick={closeModal}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            <div className="bg-white rounded-xl">
+              <div className="text-sm text-gray-500 mb-4">
+                Trip ID: {selectedTripId}
               </div>
-            )}
-            {vehicleDetails.vehicleMake && (
-              <div>
-                <h4 className="text-lg font-medium text-gray-700 mb-2">
-                  Vehicle Details
-                </h4>
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                  <p className="text-sm text-gray-600">
-                    <strong>Vehicle:</strong> {vehicleDetails.vehicleMake}{" "}
-                    {vehicleDetails.vehicleModel}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <strong>Color:</strong> {vehicleDetails.vehicleColor}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <strong>License Plate:</strong>{" "}
-                    {vehicleDetails.vehicleNumber}
-                  </p>
-                  <div className="flex gap-4 mt-2">
-                    {vehicleDetails.VEHICLE_FRONT && (
-                      <img
-                        src={vehicleDetails.VEHICLE_FRONT}
-                        alt="Front"
-                        className="w-24 h-24 rounded-md object-cover"
-                      />
-                    )}
-                    {vehicleDetails.VEHICLE_BACK && (
-                      <img
-                        src={vehicleDetails.VEHICLE_BACK}
-                        alt="Back"
-                        className="w-24 h-24 rounded-md object-cover"
-                      />
-                    )}
+
+              {driverDetails.name && (
+                <section className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                    <UserCircle className="w-5 h-5 text-indigo-500 mr-2" />
+                    Driver Details
+                  </h4>
+                  <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+                    <img
+                      src={
+                        driverDetails.profile_picture ||
+                        "/api/placeholder/80/80"
+                      }
+                      alt="Driver Profile"
+                      className="w-16 h-16 rounded-full object-cover ring-2 ring-indigo-300"
+                    />
+                    <div>
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <Phone className="w-4 h-4 mr-2 text-green-500" />
+                        {driverDetails.name}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {driverDetails.phone}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
+                </section>
+              )}
+
+              {vehicleDetails.vehicleMake && (
+                <section>
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                    <Car className="w-5 h-5 text-indigo-500 mr-2" />
+                    Vehicle Details
+                  </h4>
+                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Vehicle</p>
+                        <p className="text-sm font-medium">
+                          {vehicleDetails.vehicleMake}{" "}
+                          {vehicleDetails.vehicleModel}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Color</p>
+                        <p className="text-sm font-medium">
+                          {vehicleDetails.vehicleColor}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">License Plate</p>
+                        <p className="text-sm font-medium">
+                          {vehicleDetails.vehicleNumber}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4 mt-4">
+                      {vehicleDetails.VEHICLE_FRONT && (
+                        <img
+                          src={vehicleDetails.VEHICLE_FRONT}
+                          alt="Front View"
+                          className="w-24 h-24 rounded-lg object-cover shadow-md"
+                        />
+                      )}
+                      {vehicleDetails.VEHICLE_BACK && (
+                        <img
+                          src={vehicleDetails.VEHICLE_BACK}
+                          alt="Back View"
+                          className="w-24 h-24 rounded-lg object-cover shadow-md"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </section>
+              )}
+            </div>
           </div>
         </Modal>
 
         {/* Feedback Modal */}
         <Modal isOpen={isFeedbackModalOpen} onClose={closeFeedbackModal}>
-          <div className="p-6 bg-white rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              Leave Feedback
+          <div className="p-6 text-center">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              Ride Feedback
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               Trip ID: {tripForFeedback?.Id}
             </p>
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">Rating</p>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`w-6 h-6 cursor-pointer ${
-                      star <= feedback.rating
-                        ? "text-yellow-400 fill-current"
-                        : "text-gray-300"
-                    }`}
-                    onClick={() =>
-                      setFeedback({
-                        ...feedback,
-                        rating: star,
-                        customerID: uid,
-                      })
-                    }
-                  />
-                ))}
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2 text-center">
+                  How was your ride?
+                </p>
+                <div className="flex justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-8 h-8 cursor-pointer transition-colors duration-200 ${
+                        star <= feedback.rating
+                          ? "text-yellow-400 fill-current"
+                          : "text-gray-300 hover:text-yellow-200"
+                      }`}
+                      onClick={() => onRatingChange(star)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="comment"
-                className="block text-sm text-gray-600 mb-2"
+
+              <div>
+                <label
+                  htmlFor="comment"
+                  className="block text-sm text-gray-600 mb-2 text-center"
+                >
+                  Share your experience
+                </label>
+                <textarea
+                  id="comment"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  rows="4"
+                  placeholder="Tell us about your ride (optional)"
+                  value={feedback.comment}
+                  onChange={(e) => onCommentChange(e.target.value)}
+                />
+              </div>
+
+              <button
+                onClick={handleFeedbackSubmit}
+                className="w-full px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
               >
-                Comment
-              </label>
-              <textarea
-                id="comment"
-                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                rows="3"
-                value={feedback.comment}
-                onChange={(e) =>
-                  setFeedback({ ...feedback, comment: e.target.value })
-                }
-              />
+                Submit Feedback
+              </button>
             </div>
-            <button
-              onClick={handleFeedbackSubmit}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-            >
-              Submit Feedback
-            </button>
           </div>
         </Modal>
 

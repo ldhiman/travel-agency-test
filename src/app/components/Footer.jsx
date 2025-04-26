@@ -6,12 +6,14 @@ import {
   faTwitter,
   faInstagram,
   faLinkedin,
+  faGithub,
 } from "@fortawesome/free-brands-svg-icons";
 import {
   faEnvelope,
   faPhone,
   faMapMarkerAlt,
   faAngleRight,
+  faCode,
 } from "@fortawesome/free-solid-svg-icons";
 
 const FooterLink = ({ href, children }) => (
@@ -29,14 +31,33 @@ const FooterLink = ({ href, children }) => (
   </li>
 );
 
-const SocialIcon = ({ href, icon }) => (
+const SocialIcon = ({ href, icon, label }) => (
   <Link
     href={href}
     className="bg-gray-800 hover:bg-pink-600 text-white p-3 rounded-full transition duration-300 flex items-center justify-center"
-    aria-label={`Follow us on ${icon.iconName}`}
+    aria-label={`Follow us on ${label || icon.iconName}`}
   >
     <FontAwesomeIcon icon={icon} className="w-5 h-5" />
   </Link>
+);
+
+// New specialized developer profile component
+const DeveloperProfile = ({ href }) => (
+  <div className="relative group">
+    <Link
+      href={href}
+      className="bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 text-white p-3 rounded-full transition duration-300 flex items-center justify-center border-2 border-white shadow-lg hover:shadow-xl hover:scale-105 transform"
+      aria-label="Developer Profile"
+    >
+      <FontAwesomeIcon icon={faCode} className="w-5 h-5" />
+    </Link>
+    <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+      <div className="bg-gray-900 text-white text-xs px-3 py-1 rounded-md shadow-md">
+        Developer Profile
+      </div>
+      <div className="w-2 h-2 bg-gray-900 rotate-45 absolute left-1/2 transform -translate-x-1/2 mt-[-4px]"></div>
+    </div>
+  </div>
 );
 
 export default function Footer() {
@@ -58,7 +79,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <div className="w-full md:w-auto">
+          {/* <div className="w-full md:w-auto">
             <h3 className="text-lg font-semibold mb-3">
               Subscribe to our Newsletter
             </h3>
@@ -72,7 +93,7 @@ export default function Footer() {
                 Subscribe
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Middle Section with Links and Contact */}
@@ -169,11 +190,17 @@ export default function Footer() {
         {/* Bottom Section with Socials and Copyright */}
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex space-x-4 mb-6 md:mb-0">
-              <SocialIcon href="/" icon={faFacebookF} />
-              <SocialIcon href="/" icon={faTwitter} />
-              <SocialIcon href="/" icon={faInstagram} />
-              <SocialIcon href="/" icon={faLinkedin} />
+            <div className="flex items-center space-x-4 mb-6 md:mb-0">
+              <div className="flex space-x-4">
+                <SocialIcon href="/" icon={faFacebookF} label="Facebook" />
+                <SocialIcon href="/" icon={faTwitter} label="Twitter" />
+                <SocialIcon href="/" icon={faInstagram} label="Instagram" />
+                <SocialIcon href="/" icon={faLinkedin} label="LinkedIn" />
+                <SocialIcon href="/" icon={faGithub} label="GitHub" />
+              </div>
+              <div className="ml-2 pl-2 border-l border-gray-700">
+                <DeveloperProfile href="https://www.linkedin.com/in/paramjeet-dhiman/" />
+              </div>
             </div>
             <div className="text-center md:text-right">
               <p className="text-gray-400">
