@@ -12,6 +12,7 @@ import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Navbar() {
@@ -46,17 +47,34 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-baseline gap-0.5 group">
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-wider">
-              Travel
-            </span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-pink-400 bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-wider">
-              India
-            </span>
-            <span className="text-xs font-semibold text-pink-400 self-start mt-1">
-              .tours
-            </span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-baseline gap-0.5 group">
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-wider">
+                Travel
+              </span>
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-pink-400 bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-wider">
+                India
+              </span>
+              <span className="text-xs font-semibold text-pink-400 self-start mt-1">
+                .tours
+              </span>
+            </Link>
+
+            {/* WhatsApp Button */}
+            <Link
+              href="https://wa.me/9266332196?text=Hi%20Travel%20India"
+              legacyBehavior
+            >
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-base font-semibold px-4 py-2 rounded-full transition-colors duration-200 shadow-lg"
+              >
+                <ChatBubbleOvalLeftEllipsisIcon className="w-6 h-6" />
+                <span>Chat on WhatsApp</span>
+              </a>
+            </Link>
+          </div>
 
           {/* Mobile menu button */}
           <button

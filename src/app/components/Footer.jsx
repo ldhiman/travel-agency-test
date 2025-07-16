@@ -192,14 +192,31 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-4 mb-6 md:mb-0">
               <div className="flex space-x-4">
-                <SocialIcon href="/" icon={faFacebookF} label="Facebook" />
-                <SocialIcon href="/" icon={faTwitter} label="Twitter" />
-                <SocialIcon href="/" icon={faInstagram} label="Instagram" />
-                <SocialIcon href="/" icon={faLinkedin} label="LinkedIn" />
-                <SocialIcon href="/" icon={faGithub} label="GitHub" />
+                <SocialIcon
+                  href="https://www.facebook.com/share/18Brn5XYM5/"
+                  icon={faFacebookF}
+                  label="Facebook"
+                />
+                {/* <SocialIcon href="/" icon={faTwitter} label="Twitter" /> */}
+                <SocialIcon
+                  href="https://www.instagram.com/travelindiaofficial17?igsh=MTc2Z28yOTUyYmZ2Mw=="
+                  icon={faInstagram}
+                  label="Instagram"
+                />
+                {/* <SocialIcon href="/" icon={faLinkedin} label="LinkedIn" /> */}
+                {/* <SocialIcon href="/" icon={faGithub} label="GitHub" /> */}
               </div>
-              <div className="ml-2 pl-2 border-l border-gray-700">
-                <DeveloperProfile href="https://www.linkedin.com/in/paramjeet-dhiman/" />
+              <div className="ml-2 pl-2 border-l border-gray-700 flex space-x-6">
+                <DeveloperProfile
+                  href="https://www.linkedin.com/in/paramjeet-dhiman/"
+                  name="Paramjeet Dhiman"
+                  color="text-blue-500"
+                />
+                <DeveloperProfile
+                  href="https://www.linkedin.com/in/abhishek-jatav-067946261?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                  name="Abhishek Jatav"
+                  color="text-green-500"
+                />
               </div>
             </div>
             <div className="text-center md:text-right">
