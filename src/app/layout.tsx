@@ -9,9 +9,11 @@ import { Suspense } from "react";
 import Loading from "./components/Loading"; // Import the Loading
 
 const inter = Inter({ subsets: ["latin"] });
-
+const isRestricted = process.env.NEXT_PUBLIC_RESTRICTED === "true";
 export const metadata: Metadata = {
-  title: "Travel India - Access Restricted",
+  title: isRestricted
+    ? "Travel India - Access Restricted"
+    : "Travel India - One Stop Travel Solution",
   description: "This website is restricted due to incomplete payment.",
 };
 
@@ -20,8 +22,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isRestricted = process.env.NEXT_PUBLIC_RESTRICTED === "true";
-
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
