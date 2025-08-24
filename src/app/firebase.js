@@ -7,42 +7,36 @@ import {
   PhoneAuthProvider,
   signInWithCredential,
 } from "firebase/auth";
-
 import { getDatabase } from "firebase/database";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
-// Firebase configuration object containing keys and identifiers
+// Firebase configuration object using environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyCYhHwbgQAdJFtix9557w8FthvcMuPbPXQ",
-  authDomain: "travel-agency-18664.firebaseapp.com",
-  databaseURL:
-    "https://travel-agency-18664-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "travel-agency-18664",
-  storageBucket: "travel-agency-18664.appspot.com",
-  messagingSenderId: "401868859505",
-  appId: "1:401868859505:web:47a92b53c67eb12c6553d0",
-  measurementId: "G-QJDZ7R7K3J",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 
-// Get Firebase Authentication instance
+// Get Firebase services
 const auth = getAuth(app);
-
-// Get Firebase Database instance
 const db = getDatabase(app);
-
-// Get firebase storage
 const storage = getStorage(app);
 
-
-// function to get image url
+// Function to get file URL from Firebase Storage
 export async function getImageUrl() {
-  const imageRef = ref(storage, "noc/VehicleAuthorization.pdf"); // Replace with your image path
+  const imageRef = ref(storage, "noc/VehicleAuthorization.pdf"); // Replace with your path
   const url = await getDownloadURL(imageRef);
   return url;
 }
+
 export {
   auth,
   db,
