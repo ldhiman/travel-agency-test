@@ -13,15 +13,15 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 // Firebase configuration object containing keys and identifiers
 const firebaseConfig = {
-  apiKey: "AIzaSyCYhHwbgQAdJFtix9557w8FthvcMuPbPXQ",
-  authDomain: "travel-agency-18664.firebaseapp.com",
+  apiKey: "AIzaSyB0oI56j1sJfsnJMYYpHyAumkaev-aGm5I",
+  authDomain: "travelnow-5eb59.firebaseapp.com",
   databaseURL:
-    "https://travel-agency-18664-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "travel-agency-18664",
-  storageBucket: "travel-agency-18664.appspot.com",
-  messagingSenderId: "401868859505",
-  appId: "1:401868859505:web:47a92b53c67eb12c6553d0",
-  measurementId: "G-QJDZ7R7K3J",
+    "https://travelnow-5eb59-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "travelnow-5eb59",
+  storageBucket: "travelnow-5eb59.firebasestorage.app",
+  messagingSenderId: "824133472118",
+  appId: "1:824133472118:web:d5a8a11792af1a5d513457",
+  measurementId: "G-EY34QEDEYR",
 };
 
 // Initialize Firebase App
@@ -35,7 +35,6 @@ const db = getDatabase(app);
 
 // Get firebase storage
 const storage = getStorage(app);
-
 
 // function to get image url
 export async function getImageUrl() {

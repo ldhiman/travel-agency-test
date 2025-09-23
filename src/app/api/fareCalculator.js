@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 // Base URL of the API
-const apiUrl = "https://calculatedistanceandfare-no72p4gkhq-uc.a.run.app";
+const apiUrl = "https://calculatedistanceandfare-r7jlysgvba-uc.a.run.app";
 
 const fetchDistanceAndFare = async (
   tripType,
