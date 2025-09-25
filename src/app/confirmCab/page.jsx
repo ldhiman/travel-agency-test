@@ -315,37 +315,53 @@ const ConfirmCab = () => {
                     </div>
                   )}
 
-                  {cabData.distanceData.distance && (
-                    <div className="flex items-start">
-                      <div className="bg-indigo-50 p-2 rounded-lg mr-4">
-                        <CarTaxiFront className="text-indigo-600" size={22} />
+                  {cabData.tripType !== "HOURLY RENTAL" &&
+                    cabData.distanceData.distance && (
+                      <div className="flex items-start">
+                        <div className="bg-indigo-50 p-2 rounded-lg mr-4">
+                          <CarTaxiFront className="text-indigo-600" size={22} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">
+                            Distance
+                          </p>
+                          <p className="font-medium text-gray-800">
+                            {cabData.distanceData.distance}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">
-                          Distance
-                        </p>
-                        <p className="font-medium text-gray-800">
-                          {cabData.distanceData.distance}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {cabData.distanceData.duration && (
+                    )}
+                  {cabData.tripType === "HOURLY RENTAL" && (
                     <div className="flex items-start">
                       <div className="bg-indigo-50 p-2 rounded-lg mr-4">
                         <Clock className="text-indigo-600" size={22} />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-500">
-                          Estimated Duration
+                          Rental Duration
                         </p>
                         <p className="font-medium text-gray-800">
-                          {cabData.distanceData.duration}
+                          {cabData.hours} hours
                         </p>
                       </div>
                     </div>
                   )}
+                  {cabData.tripType !== "HOURLY RENTAL" &&
+                    cabData.distanceData.duration && (
+                      <div className="flex items-start">
+                        <div className="bg-indigo-50 p-2 rounded-lg mr-4">
+                          <Clock className="text-indigo-600" size={22} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-500">
+                            Estimated Duration
+                          </p>
+                          <p className="font-medium text-gray-800">
+                            {cabData.distanceData.duration}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                 </div>
               </div>
 

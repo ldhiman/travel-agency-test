@@ -134,12 +134,24 @@ export default function Footer() {
               Popular Destinations
             </h3>
             <ul className="space-y-1">
-              <FooterLink href="/">Delhi to Agra</FooterLink>
-              <FooterLink href="/">Mumbai to Pune</FooterLink>
-              <FooterLink href="/">Bangalore to Mysore</FooterLink>
-              <FooterLink href="/">Chennai to Pondicherry</FooterLink>
-              <FooterLink href="/">Jaipur to Udaipur</FooterLink>
-              <FooterLink href="/">Delhi to Jaipur</FooterLink>
+              <FooterLink href="/?source=delhi&des=agra">
+                Delhi to Agra
+              </FooterLink>
+              <FooterLink href="/?source=mumbai&des=pune">
+                Mumbai to Pune
+              </FooterLink>
+              <FooterLink href="/?source=banglore&des=mysore">
+                Bangalore to Mysore
+              </FooterLink>
+              <FooterLink href="/?source=chennai&des=pondicherry">
+                Chennai to Pondicherry
+              </FooterLink>
+              <FooterLink href="/?source=jaipur&des=udaipur">
+                Jaipur to Udaipur
+              </FooterLink>
+              <FooterLink href="/?source=delhi&des=jaipur">
+                Delhi to Jaipur
+              </FooterLink>
             </ul>
           </div>
 

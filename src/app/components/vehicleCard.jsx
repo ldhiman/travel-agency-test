@@ -104,6 +104,8 @@ const VehicleCard = ({
   const getFareBreakdownItems = () => {
     const items = [];
 
+    console.log(fareDetails);
+
     if (fareDetails.baseFare >= 0) {
       items.push({
         label: "Base Fare",
@@ -168,11 +170,17 @@ const VehicleCard = ({
     const notes = [];
 
     if (fareDetails.stateTax <= 0) {
-      notes.push("State Tax not included");
+      notes.push("State Tax not included, if any paid by passenger");
     }
 
     if (!fareDetails.tollTax || fareDetails.tollTax <= 0) {
-      notes.push("Toll Tax not applicable");
+      notes.push("Toll Tax not included, if any paid by passenger");
+    }
+
+    if (tripType === "HOURLY RENTAL") {
+      notes.push(
+        "Extra km charged at ₹" + fareDetails.extraKmCharge + " per km"
+      );
     }
 
     return notes;
@@ -312,17 +320,6 @@ const VehicleCard = ({
                       </tr>
                     </tbody>
                   </table>
-
-                  {getFareNotes().length > 0 && (
-                    <div className="mt-3 text-xs text-gray-500 flex items-start">
-                      <AlertCircle className="mr-1 flex-shrink-0" size={14} />
-                      <div>
-                        {getFareNotes().map((note, index) => (
-                          <p key={index}>{note}</p>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -371,6 +368,24 @@ const VehicleCard = ({
                       {includeToll ? "Included" : "Excluded"}
                     </span>
                   </label>
+                </div>
+              </div>
+            )}
+            {getFareNotes().length > 0 && (
+              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="flex items-start">
+                  <AlertCircle
+                    className="mr-3 text-amber-600 flex-shrink-0 mt-0.5"
+                    size={18}
+                  />
+                  <div className="text-sm text-amber-800">
+                    <p className="font-semibold mb-2">Important Notes:</p>
+                    {getFareNotes().map((note, index) => (
+                      <p key={index} className="mb-1">
+                        • {note}
+                      </p>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -482,28 +497,48 @@ const TripDetailsCard = ({ tripData }) => {
             </div>
           </div>
 
-          {tripData.distanceData?.distance && (
-            <div className="flex items-start">
-              <div className="bg-blue-100 p-2 rounded-full mr-3">
-                <CarTaxiFront className="text-blue-600" size={20} />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Total Distance</p>
-                <p className="font-medium">{tripData.distanceData.distance}</p>
-              </div>
-            </div>
-          )}
-
-          {tripData.distanceData?.duration && (
+          {tripData.tripType === "HOURLY RENTAL" ? (
             <div className="flex items-start md:col-span-2">
               <div className="bg-purple-100 p-2 rounded-full mr-3">
                 <Clock className="text-purple-600" size={20} />
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Estimated Duration</p>
-                <p className="font-medium">{tripData.distanceData.duration}</p>
+                <p className="text-sm text-gray-500 mb-1">Rental Duration</p>
+                <p className="font-medium">{tripData.hours} Hours</p>
               </div>
             </div>
+          ) : (
+            (
+              tripData.distanceData?.distance && (
+                <div className="flex items-start">
+                  <div className="bg-blue-100 p-2 rounded-full mr-3">
+                    <CarTaxiFront className="text-blue-600" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Total Distance</p>
+                    <p className="font-medium">
+                      {tripData.distanceData.distance}
+                    </p>
+                  </div>
+                </div>
+              )
+            )(
+              tripData.distanceData?.duration && (
+                <div className="flex items-start md:col-span-2">
+                  <div className="bg-purple-100 p-2 rounded-full mr-3">
+                    <Clock className="text-purple-600" size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">
+                      Estimated Duration
+                    </p>
+                    <p className="font-medium">
+                      {tripData.distanceData.duration}
+                    </p>
+                  </div>
+                </div>
+              )
+            )
           )}
         </div>
       </div>

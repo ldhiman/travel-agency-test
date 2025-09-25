@@ -15,6 +15,7 @@ const CabSelection = () => {
         try {
           const decodedData = JSON.parse(decodeURIComponent(atob(dataParam)));
           setTripData(decodedData);
+          console.log("Decoded Trip Data:", decodedData);
         } catch (error) {
           console.error("Failed to parse trip data:", error);
         }
@@ -32,6 +33,8 @@ const CabSelection = () => {
       includeToll,
       fare: tripData.distanceData.fares[vehicleType],
     };
+
+    Object.freeze(bookingData);
 
     router.push(
       "/confirmCab?" +
