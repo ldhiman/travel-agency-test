@@ -6,24 +6,30 @@ import { TripDetailsCard, VehicleCard } from "../components/vehicleCard";
 const CabSelection = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [tripData, setTripData] = useState(null);
+  const tripData = JSON.parse(sessionStorage.getItem("tripData"));
 
-  useEffect(() => {
-    const fetchTripData = async () => {
-      const dataParam = searchParams.get("data");
-      if (dataParam) {
-        try {
-          const decodedData = JSON.parse(decodeURIComponent(atob(dataParam)));
-          setTripData(decodedData);
-          console.log("Decoded Trip Data:", decodedData);
-        } catch (error) {
-          console.error("Failed to parse trip data:", error);
-        }
-      }
-    };
+  if (tripData === null) {
+    router.push("/");
+  }
 
-    fetchTripData();
-  }, [searchParams]);
+  // const [tripData, setTripData] = useState(null);
+
+  // useEffect(() => {
+  //   const fetchTripData = async () => {
+  //     const dataParam = searchParams.get("data");
+  //     if (dataParam) {
+  //       try {
+  //         const decodedData = JSON.parse(decodeURIComponent(atob(dataParam)));
+  //         setTripData(decodedData);
+  //         console.log("Decoded Trip Data:", decodedData);
+  //       } catch (error) {
+  //         console.error("Failed to parse trip data:", error);
+  //       }
+  //     }
+  //   };
+
+  //   fetchTripData();
+  // }, [searchParams]);
 
   const handleVehicleSelection = (vehicleType, totalCost, includeToll) => {
     const bookingData = {
@@ -36,12 +42,16 @@ const CabSelection = () => {
 
     Object.freeze(bookingData);
 
-    router.push(
-      "/confirmCab?" +
-        new URLSearchParams({
-          data: btoa(JSON.stringify(bookingData)),
-        }).toString()
-    );
+    sessionStorage.setItem("bookingData", JSON.stringify(bookingData));
+
+    // router.push(
+    //   "/confirmCab?" +
+    //     new URLSearchParams({
+    //       data: btoa(JSON.stringify(bookingData)),
+    //     }).toString()
+    // );
+
+    router.push("/confirmCab");
   };
 
   if (!tripData) {

@@ -24,11 +24,17 @@ import {
 const ConfirmCab = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [cabData, setCabData] = useState(null);
+  // const [cabData, setCabData] = useState(null);
   const [error, setError] = useState(null);
   const [uid, setUid] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+
+  const cabData = JSON.parse(sessionStorage.getItem("bookingData"));
+
+  if (cabData === null) {
+    router.push("/");
+  }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -43,25 +49,25 @@ const ConfirmCab = () => {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchCabData = async () => {
-      const dataParam = searchParams.get("data");
-      if (dataParam) {
-        try {
-          const decodedData = JSON.parse(atob(dataParam));
-          setCabData(decodedData);
-          console.log("Here is the data", decodedData);
-        } catch (error) {
-          console.error("Failed to parse trip data:", error);
-          setError("Failed to parse trip data.");
-        }
-      } else {
-        setError("No data parameter found in URL.");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCabData = async () => {
+  //     const dataParam = searchParams.get("data");
+  //     if (dataParam) {
+  //       try {
+  //         const decodedData = JSON.parse(atob(dataParam));
+  //         setCabData(decodedData);
+  //         console.log("Here is the data", decodedData);
+  //       } catch (error) {
+  //         console.error("Failed to parse trip data:", error);
+  //         setError("Failed to parse trip data.");
+  //       }
+  //     } else {
+  //       setError("No data parameter found in URL.");
+  //     }
+  //   };
 
-    fetchCabData();
-  }, [searchParams]);
+  //   fetchCabData();
+  // }, [searchParams]);
 
   // Trip type prefixes
   const TRIP_TYPE_PREFIXES = {

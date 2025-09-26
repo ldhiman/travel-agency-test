@@ -36,7 +36,9 @@ import {
 } from "@mui/icons-material";
 import { processTripData } from "../api/processTripData";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { faL } from "@fortawesome/free-solid-svg-icons";
+import { set } from "date-fns";
 
 const libraries = ["places"];
 const center = { lat: 20.5937, lng: 78.9629 }; // Default center of India
@@ -66,6 +68,7 @@ const TripPlanner = () => {
   const [formError, setFormError] = useState("");
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // --- GOOGLE MAPS API LOADER ---
   const { isLoaded } = useJsApiLoader({
@@ -74,6 +77,48 @@ const TripPlanner = () => {
   });
 
   // --- EFFECTS ---
+  useEffect(() => {
+    // This function converts an address string to coordinates
+    const getCoordsFromAddress = async (address, type) => {
+      if (!isLoaded || !address) return;
+
+      const geocoder = new window.google.maps.Geocoder();
+      try {
+        const { results } = await geocoder.geocode({ address });
+        if (results && results[0]) {
+          const location = results[0].geometry.location;
+          const coords = { lat: location.lat(), lng: location.lng() };
+
+          // Set state for both address string and coordinates
+          if (type === "source") {
+            setSource(results[0].formatted_address);
+            setSourceCoords(coords);
+          } else {
+            setDestination(results[0].formatted_address);
+            setDestinationCoords(coords);
+          }
+        } else {
+          toast.error(`Could not find location: ${address}`);
+        }
+      } catch (error) {
+        console.error(`Geocoding error for ${address}:`, error);
+      }
+    };
+
+    const sourceFromUrl = searchParams.get("source");
+    const destinationFromUrl = searchParams.get("des"); // Note: it's "des" in your URL
+
+    if (sourceFromUrl) {
+      setLoading(true);
+      getCoordsFromAddress(sourceFromUrl, "source");
+      setLoading(false);
+    }
+    if (destinationFromUrl) {
+      setLoading(true);
+      getCoordsFromAddress(destinationFromUrl, "destination");
+      setLoading(false);
+    }
+  }, [isLoaded]);
 
   // Get user's initial location
   useEffect(() => {
@@ -245,12 +290,14 @@ const TripPlanner = () => {
 
       const completeTripData = { ...tripData, distanceData };
       toast.success("Cabs found! Redirecting to selection...");
-      router.push(
-        "/cabSelection?" +
-          new URLSearchParams({
-            data: btoa(encodeURIComponent(JSON.stringify(completeTripData))),
-          })
-      );
+      sessionStorage.setItem("tripData", JSON.stringify(completeTripData));
+      router.push("/cabSelection");
+      // router.push(
+      //   "/cabSelection?" +
+      //     new URLSearchParams({
+      //       data: btoa(encodeURIComponent(JSON.stringify(completeTripData))),
+      //     })
+      // );
     } catch (error) {
       toast.error("Oops! Something went wrong. Please try again.");
       console.error(error);

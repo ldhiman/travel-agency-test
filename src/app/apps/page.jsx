@@ -58,7 +58,7 @@ export default function AppsPage() {
                 earnings, and grow your business.
               </p>
               <Link
-                href="/"
+                href="https://play.google.com/store/apps/details?id=com.travel.india"
                 className="flex items-center rounded-xl text-white bg-indigo-500 border-0 py-3 px-8 focus:outline-none hover:bg-indigo-600 transition-colors duration-300 shadow-md hover:shadow-lg"
               >
                 <Download className="mr-2" size={20} />
