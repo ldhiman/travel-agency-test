@@ -508,8 +508,8 @@ const TripDetailsCard = ({ tripData }) => {
               </div>
             </div>
           ) : (
-            (
-              tripData.distanceData?.distance && (
+            <>
+              {tripData.distanceData?.distance && (
                 <div className="flex items-start">
                   <div className="bg-blue-100 p-2 rounded-full mr-3">
                     <CarTaxiFront className="text-blue-600" size={20} />
@@ -521,9 +521,9 @@ const TripDetailsCard = ({ tripData }) => {
                     </p>
                   </div>
                 </div>
-              )
-            )(
-              tripData.distanceData?.duration && (
+              )}
+
+              {tripData.distanceData?.duration && (
                 <div className="flex items-start md:col-span-2">
                   <div className="bg-purple-100 p-2 rounded-full mr-3">
                     <Clock className="text-purple-600" size={20} />
@@ -537,8 +537,8 @@ const TripDetailsCard = ({ tripData }) => {
                     </p>
                   </div>
                 </div>
-              )
-            )
+              )}
+            </>
           )}
         </div>
       </div>
